@@ -1,16 +1,19 @@
-public class TileInstance
+namespace MJ.TileModel
 {
-    public TileType Type { get; }
-    public int InstanceId { get; }
-
-    public TileInstance(TileType type, int instanceId)
+    public class TileInstance
     {
-        Type = type;
-        InstanceId = instanceId;
-    }
+        public TileType Type { get; }
+        public int InstanceId { get; }
 
-    public override string ToString()
-    {
-        return $"#{InstanceId}: {Type}";
+        public TileInstance(TileType type, int instanceId)
+        {
+            Type = type;
+            InstanceId = instanceId;
+        }
+
+        public override string ToString()
+        {
+            return $"#{InstanceId}: {Type}";
+        }
     }
 }
