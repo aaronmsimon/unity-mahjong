@@ -1,4 +1,4 @@
-namespace MJ.TileModel
+namespace MJ.Core
 {
     public class TileInstance
     {

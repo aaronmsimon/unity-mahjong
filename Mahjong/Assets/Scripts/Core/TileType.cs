@@ -1,6 +1,6 @@
 using System;
 
-namespace MJ.TileModel
+namespace MJ.Core
 {
     public enum Suit {
         Dots,
