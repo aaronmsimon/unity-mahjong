@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using MJ.TileModel;
+using MJ.Core;
 
 namespace MJ.Testing
 {
