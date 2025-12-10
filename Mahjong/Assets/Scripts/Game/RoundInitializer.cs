@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using MJ.Core;
+using MJ.Game;
+using MJ.Player;
 
 public static class RoundInitializer
 {
@@ -14,7 +17,7 @@ public static class RoundInitializer
     public static GameState StartNewRound(int dealerSeat = 0, int? shuffleSeed = null)
     {
         // 1. Build wall
-        List<TileInstance> wall = WallFactory.BuildStandardWall(shuffleSeed);
+        List<TileInstance> wall = WallFactory.BuildHKWall(shuffleSeed);
 
         // 2. Create players
         var players = new List<PlayerState>(4);

@@ -5,7 +5,7 @@ namespace MJ.Core
 {
     public static class WallFactory
     {
-        public static List<TileInstance> BuildHKWall()
+        public static List<TileInstance> BuildHKWall(int? seed = null)
         {
             List<TileInstance> tileInstances = new List<TileInstance>(136);
             int nextId = 0;
@@ -37,13 +37,16 @@ namespace MJ.Core
             // TODO: if you decide to use flowers/seasons for Hong Kong rules,
             // you can add them here in a similar pattern.
 
+            // --- Shuffle the wall ---
+            var rng = seed.HasValue ? new Random(seed.Value) : new Random();
+            ShuffleInPlace(tileInstances, rng);
+
             return tileInstances;
         }
 
         // Fisher–Yates shuffle.
-        public static void ShuffleInPlace<T>(IList<T> list, int? seed = null)
+        private static void ShuffleInPlace<T>(IList<T> list, Random rng)
         {
-            var rng = seed.HasValue ? new Random(seed.Value) : new Random();
             
             for (int i = list.Count - 1; i > 0; i--)
             {
