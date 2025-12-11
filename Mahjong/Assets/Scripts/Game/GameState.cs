@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MJ.Core;
-using MJ.Player;
 
 namespace MJ.Game
 {
