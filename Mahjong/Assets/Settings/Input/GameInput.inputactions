@@ -1,0 +1,115 @@
+{
+    "version": 1,
+    "name": "GameInput",
+    "maps": [
+        {
+            "name": "Debug",
+            "id": "a3add73f-336a-4f4e-a7dc-0b3cb9d44001",
+            "actions": [
+                {
+                    "name": "StartNewRound",
+                    "type": "Button",
+                    "id": "cc2ff1e7-8a1e-402a-9dfa-f1b982055c0f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrintHands",
+                    "type": "Button",
+                    "id": "ab235483-ff81-4405-a9de-dfc8176e8673",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrintWallCount",
+                    "type": "Button",
+                    "id": "7ec3bb47-62bc-4f33-8286-0ae8cb25f8d2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrintDiscards",
+                    "type": "Button",
+                    "id": "70c10dcb-ba2f-463d-8481-6579a4ab6eae",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrintTurnInfo",
+                    "type": "Button",
+                    "id": "95ebbc7a-4080-4ae8-9184-1a22c9f9f55f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "3cb746b3-258a-4bcc-82e5-9912d2a4ffbd",
+                    "path": "<Keyboard>/f1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StartNewRound",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38417462-cb34-4f5c-892b-433de4612973",
+                    "path": "<Keyboard>/f2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrintHands",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1e03e79e-7014-45e2-950e-4634a8e42eef",
+                    "path": "<Keyboard>/f3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrintWallCount",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fb3405bc-f2f0-434d-85c5-0914bebd1b08",
+                    "path": "<Keyboard>/f4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrintDiscards",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "380b90a5-d0e5-483e-8839-2fb21f76f753",
+                    "path": "<Keyboard>/f5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrintTurnInfo",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

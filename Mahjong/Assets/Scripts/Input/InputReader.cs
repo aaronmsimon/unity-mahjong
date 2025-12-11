@@ -1,0 +1,78 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Events;
+
+namespace MJ.Input
+{
+    [CreateAssetMenu(fileName = "InputReader", menuName = "Game/Input Reader")]
+    public class InputReader : ScriptableObject, GameInput.IDebugActions
+    {
+        // Debug
+        public event UnityAction startNewRoundEvent;
+        public event UnityAction printHandsEvent;
+        public event UnityAction printWallCountEvent;
+        public event UnityAction printDiscardsEvent;
+        public event UnityAction printTurnInfoEvent;
+
+        private GameInput gameInput;
+
+        private void OnEnable()
+        {
+            if (gameInput == null)
+            {
+                gameInput = new GameInput();
+                gameInput.Debug.SetCallbacks(this);
+            }
+
+            // EnableDebugInput();
+        }
+
+        private void OnDisable()
+        {
+            DisableAllInput();
+        }
+
+        // Debug Events
+        public void OnStartNewRound(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                startNewRoundEvent?.Invoke();
+        }
+
+        public void OnPrintHands(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                printHandsEvent?.Invoke();
+        }
+
+        public void OnPrintWallCount(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                printWallCountEvent?.Invoke();
+        }
+
+        public void OnPrintDiscards(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                printDiscardsEvent?.Invoke();
+        }
+
+        public void OnPrintTurnInfo(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                printTurnInfoEvent?.Invoke();
+        }
+
+        // Enable/Disable Action Maps
+
+        public void EnableDebugInput()
+        {
+            gameInput.Debug.Enable();
+        }
+
+        public void DisableAllInput()
+        {
+            gameInput.Debug.Disable();
+        }
+    }
+}

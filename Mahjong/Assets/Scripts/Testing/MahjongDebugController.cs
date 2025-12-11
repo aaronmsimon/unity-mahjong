@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq;
+using MJ.Input;
 using MJ.Game;
 
 namespace MJ.Testing
@@ -37,6 +38,9 @@ namespace MJ.Testing
         [Range(0, 3)]
         public int debugSeat = 0;
 
+        [Header("Input")]
+        [SerializeField] private InputReader inputReader;
+
         /// <summary>
         /// Current game state for this debug controller.
         /// </summary>
@@ -44,52 +48,16 @@ namespace MJ.Testing
 
         private void Start()
         {
+            inputReader.EnableDebugInput();
+            inputReader.startNewRoundEvent += StartNewRound;
+            inputReader.printHandsEvent += PrintHands;
+            inputReader.printWallCountEvent += PrintWallCount;
+            inputReader.printDiscardsEvent += PrintDiscards;
+            inputReader.printTurnInfoEvent += PrintTurnInfo;
+            
             if (autoStartOnPlay)
             {
                 StartNewRound();
-            }
-        }
-
-        private void Update()
-        {
-            if (!enableKeyboardShortcuts)
-                return;
-
-            // These are just examples — tweak to taste.
-            if (Input.GetKeyDown(KeyCode.F1))
-            {
-                StartNewRound();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F2))
-            {
-                PrintHands();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                PrintWallCount();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F4))
-            {
-                PrintDiscards();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                PrintTurnInfo();
-            }
-
-            // Force draw/discard for the debugSeat
-            if (Input.GetKeyDown(KeyCode.G))  // G for "Grab" / draw
-            {
-                ForceDraw(debugSeat);
-            }
-
-            if (Input.GetKeyDown(KeyCode.H))  // H for "Hand discard" by first tile
-            {
-                ForceDiscardByIndex(debugSeat, 0);
             }
         }
 
