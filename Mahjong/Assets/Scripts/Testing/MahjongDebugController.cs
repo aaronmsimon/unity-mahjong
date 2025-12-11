@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Linq;
 using MJ.Input;
 using MJ.Game;
+using MJ.Rules;
+using MJ.Player;
 
 namespace MJ.Testing
 {
@@ -46,6 +48,15 @@ namespace MJ.Testing
         /// </summary>
         public GameState State { get; private set; }
 
+        public int CurrentSeat
+        {
+            get
+            {
+                if (State == null) return 0;
+                return State.CurrentSeat;
+            }
+        }
+
         private void Start()
         {
             inputReader.EnableDebugInput();
@@ -54,6 +65,7 @@ namespace MJ.Testing
             inputReader.printWallCountEvent += PrintWallCount;
             inputReader.printDiscardsEvent += PrintDiscards;
             inputReader.printTurnInfoEvent += PrintTurnInfo;
+            inputReader.printCurrentHandEvent += PrintCurrentHand;
             
             if (autoStartOnPlay)
             {
@@ -201,6 +213,134 @@ namespace MJ.Testing
             }
 
             Debug.Log($"[MahjongDebug] Dealer: {State.DealerSeat}, Current: {State.CurrentSeat}, Phase: {State.TurnPhase}");
+        }
+
+        [ContextMenu("Print Current Hand")]
+        public void PrintCurrentHand() {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            var tiles = string.Join(", ", State.Players[State.CurrentSeat].Hand.Select(t => t.Type.ToString()));
+            Debug.Log($"[MahjongDebug] Seat {State.Players[State.CurrentSeat].SeatIndex} Hand ({State.Players[State.CurrentSeat].Hand.Count}): {tiles}");
+        }
+
+        [ContextMenu("Print Legal Actions For Current Seat")]
+        public void PrintLegalActionsForCurrentSeat()
+        {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            var actions = RuleEngine.GetLegalActions(State, State.CurrentSeat);
+            if (actions.Count == 0)
+            {
+                Debug.Log($"[MahjongDebug] No legal actions for seat {State.CurrentSeat} (round over? {State.IsRoundOver}).");
+                return;
+            }
+
+            Debug.Log($"[MahjongDebug] Legal actions for seat {State.CurrentSeat}, phase {State.TurnPhase}:");
+            foreach (var a in actions)
+            {
+                Debug.Log($"    {a}");
+            }
+        }
+
+        [ContextMenu("Step Draw For Current Seat")]
+        public void StepDrawForCurrentSeat()
+        {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            if (State.IsRoundOver)
+            {
+                Debug.Log("[MahjongDebug] Round is over, cannot draw.");
+                return;
+            }
+
+            if (State.TurnPhase != TurnPhase.Draw)
+            {
+                Debug.Log($"[MahjongDebug] Not in Draw phase (current phase is {State.TurnPhase}).");
+                return;
+            }
+
+            var actions = RuleEngine.GetLegalActions(State, State.CurrentSeat);
+            var draw = actions.Find(a => a.Type == ActionType.Draw);
+            if (draw == null)
+            {
+                Debug.Log("[MahjongDebug] No Draw action available.");
+                return;
+            }
+
+            Debug.Log($"[MahjongDebug] Applying action: {draw}");
+            RuleEngine.ApplyAction(State, draw);
+
+            // Show updated hand for that seat
+            var player = State.GetPlayer(State.CurrentSeat);
+            var tiles = string.Join(", ", player.Hand.Select(t => t.Type.ToString()));
+            Debug.Log($"[MahjongDebug] Seat {player.SeatIndex} hand after draw ({player.Hand.Count}): {tiles}");
+            PrintTurnInfo();
+        }
+
+        public void StepDiscardForCurrentSeatByIndex(int handIndex)
+        {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            if (State.IsRoundOver)
+            {
+                Debug.Log("[MahjongDebug] Round is over, cannot discard.");
+                return;
+            }
+
+            if (State.TurnPhase != TurnPhase.Discard)
+            {
+                Debug.Log($"[MahjongDebug] Not in Discard phase (current phase is {State.TurnPhase}).");
+                return;
+            }
+
+            var player = State.GetPlayer(State.CurrentSeat);
+
+            if (handIndex < 0 || handIndex >= player.Hand.Count)
+            {
+                Debug.LogWarning($"[MahjongDebug] Invalid hand index {handIndex} for seat {State.CurrentSeat}.");
+                return;
+            }
+
+            var tileToDiscard = player.Hand[handIndex];
+
+            var actions = RuleEngine.GetLegalActions(State, State.CurrentSeat);
+            PlayerAction discardAction = actions.Find(a =>
+                a.Type == ActionType.Discard &&
+                a.Tile == tileToDiscard);
+
+            if (discardAction == null)
+            {
+                Debug.Log("[MahjongDebug] No matching Discard action for that tile (unexpected).");
+                return;
+            }
+
+            Debug.Log($"[MahjongDebug] Applying action: {discardAction}");
+            RuleEngine.ApplyAction(State, discardAction);
+
+            PrintDiscards();
+            PrintTurnInfo();
+        }
+
+        [ContextMenu("Step Discard First Tile For Current Seat")]
+        public void StepDiscardFirstTileForCurrentSeat()
+        {
+            StepDiscardForCurrentSeatByIndex(0);
         }
     }
 }
