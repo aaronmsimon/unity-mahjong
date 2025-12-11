@@ -46,9 +46,11 @@ namespace MJ.Rules
                         actions.Add(PlayerAction.Discard(seat, tile));
                     }
 
-                    // Stub: always allow DeclareWin to be visible for now.
-                    // Later, gate this on HandEvaluator.IsWinningHand(...)
-                    actions.Add(PlayerAction.DeclareWin(seat));
+                    // Only offer DeclareWin if it's actually a winning hand.
+                    if (HandEvaluator.IsWinningHand(player))
+                    {
+                        actions.Add(PlayerAction.DeclareWin(seat));
+                    }
                     break;
             }
 
@@ -144,8 +146,13 @@ namespace MJ.Rules
 
         private static void ApplyDeclareWin(GameState state, PlayerState player)
         {
-            // Later, call HandEvaluator here and validate the win.
-            // For now, just mark the round as over and this player as winner.
+            // Validate the hand is actually winning.
+            if (!HandEvaluator.IsWinningHand(player))
+            {
+                throw new InvalidOperationException(
+                    $"Seat {player.SeatIndex} attempted to declare win, but hand is not winning.");
+            }
+
             player.HasWon = true;
             state.IsRoundOver = true;
             state.WinnerSeat = player.SeatIndex;

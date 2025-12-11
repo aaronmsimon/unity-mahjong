@@ -342,5 +342,47 @@ namespace MJ.Testing
         {
             StepDiscardForCurrentSeatByIndex(0);
         }
+
+        [ContextMenu("Step Declare Win For Current Seat")]
+        public void StepDeclareWinForCurrentSeat()
+        {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            if (State.IsRoundOver)
+            {
+                Debug.Log("[MahjongDebug] Round is already over.");
+                return;
+            }
+
+            var seat = State.CurrentSeat;
+            var player = State.GetPlayer(seat);
+
+            if (!HandEvaluator.IsWinningHand(player))
+            {
+                Debug.Log($"[MahjongDebug] Seat {seat}'s hand is not a winning hand. Cannot declare win.");
+                return;
+            }
+
+            // Find the DeclareWin action from the legal actions list.
+            var actions = RuleEngine.GetLegalActions(State, seat);
+            var winAction = actions.Find(a => a.Type == ActionType.DeclareWin);
+
+            if (winAction == null)
+            {
+                Debug.Log($"[MahjongDebug] No DeclareWin action available for seat {seat} (unexpected).");
+                return;
+            }
+
+            Debug.Log($"[MahjongDebug] Applying action: {winAction}");
+            RuleEngine.ApplyAction(State, winAction);
+
+            Debug.Log($"[MahjongDebug] Seat {seat} has declared win! Round over = {State.IsRoundOver}, WinnerSeat = {State.WinnerSeat}.");
+            PrintHands();
+            PrintDiscards();
+        }
     }
 }
