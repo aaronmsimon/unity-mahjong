@@ -13,6 +13,7 @@ namespace MJ.Input
         public event UnityAction printWallCountEvent;
         public event UnityAction printDiscardsEvent;
         public event UnityAction printTurnInfoEvent;
+        public event UnityAction printCurrentHandEvent;
 
         private GameInput gameInput;
 
@@ -61,6 +62,12 @@ namespace MJ.Input
         {
             if (context.phase == InputActionPhase.Performed)
                 printTurnInfoEvent?.Invoke();
+        }
+
+        public void OnPrintCurrentHand(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                printCurrentHandEvent?.Invoke();
         }
 
         // Enable/Disable Action Maps

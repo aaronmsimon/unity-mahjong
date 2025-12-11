@@ -136,6 +136,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PrintCurrentHand"",
+                    ""type"": ""Button"",
+                    ""id"": ""8032378c-e89f-4b90-8abd-8a2ff82dd0e5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -193,6 +202,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""PrintTurnInfo"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""543693b7-ab12-4140-b7ff-167af627b0d4"",
+                    ""path"": ""<Keyboard>/f6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrintCurrentHand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -206,6 +226,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Debug_PrintWallCount = m_Debug.FindAction("PrintWallCount", throwIfNotFound: true);
         m_Debug_PrintDiscards = m_Debug.FindAction("PrintDiscards", throwIfNotFound: true);
         m_Debug_PrintTurnInfo = m_Debug.FindAction("PrintTurnInfo", throwIfNotFound: true);
+        m_Debug_PrintCurrentHand = m_Debug.FindAction("PrintCurrentHand", throwIfNotFound: true);
     }
 
     ~@GameInput()
@@ -291,6 +312,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Debug_PrintWallCount;
     private readonly InputAction m_Debug_PrintDiscards;
     private readonly InputAction m_Debug_PrintTurnInfo;
+    private readonly InputAction m_Debug_PrintCurrentHand;
     /// <summary>
     /// Provides access to input actions defined in input action map "Debug".
     /// </summary>
@@ -322,6 +344,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Debug/PrintTurnInfo".
         /// </summary>
         public InputAction @PrintTurnInfo => m_Wrapper.m_Debug_PrintTurnInfo;
+        /// <summary>
+        /// Provides access to the underlying input action "Debug/PrintCurrentHand".
+        /// </summary>
+        public InputAction @PrintCurrentHand => m_Wrapper.m_Debug_PrintCurrentHand;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -363,6 +389,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @PrintTurnInfo.started += instance.OnPrintTurnInfo;
             @PrintTurnInfo.performed += instance.OnPrintTurnInfo;
             @PrintTurnInfo.canceled += instance.OnPrintTurnInfo;
+            @PrintCurrentHand.started += instance.OnPrintCurrentHand;
+            @PrintCurrentHand.performed += instance.OnPrintCurrentHand;
+            @PrintCurrentHand.canceled += instance.OnPrintCurrentHand;
         }
 
         /// <summary>
@@ -389,6 +418,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @PrintTurnInfo.started -= instance.OnPrintTurnInfo;
             @PrintTurnInfo.performed -= instance.OnPrintTurnInfo;
             @PrintTurnInfo.canceled -= instance.OnPrintTurnInfo;
+            @PrintCurrentHand.started -= instance.OnPrintCurrentHand;
+            @PrintCurrentHand.performed -= instance.OnPrintCurrentHand;
+            @PrintCurrentHand.canceled -= instance.OnPrintCurrentHand;
         }
 
         /// <summary>
@@ -464,5 +496,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPrintTurnInfo(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PrintCurrentHand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPrintCurrentHand(InputAction.CallbackContext context);
     }
 }
