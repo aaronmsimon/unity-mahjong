@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MJ.Core;
+using MJ.Player;
 
 namespace MJ.Game
 {
@@ -45,6 +46,16 @@ namespace MJ.Game
         /// </summary>
         public TurnPhase TurnPhase { get; set; }
 
+        /// <summary>
+        /// Has the current round ended? (win or draw / wall exhausted)
+        /// </summary>
+        public bool IsRoundOver { get; set; }
+
+        /// <summary>
+        /// The seat index of the winner, if any (0-3), or -1 if none.
+        /// </summary>
+        public int WinnerSeat { get; set; } = -1;
+
         public GameState(List<PlayerState> players, List<TileInstance> wall)
         {
             _players = players;
@@ -56,6 +67,9 @@ namespace MJ.Game
             {
                 _discardsByPlayer.Add(new List<TileInstance>());
             }
+
+            IsRoundOver = false;
+            WinnerSeat = -1;
         }
 
         public PlayerState GetPlayer(int seatIndex) => _players[seatIndex];

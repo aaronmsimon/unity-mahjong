@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MJ.Core;
 using MJ.Game;
+using MJ.Player;
 
 public static class RoundInitializer
 {

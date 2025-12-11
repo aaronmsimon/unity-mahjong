@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using MJ.Core;
 
-namespace MJ.Core
+namespace MJ.Player
 {
     public sealed class PlayerState {
         /// <summary>
