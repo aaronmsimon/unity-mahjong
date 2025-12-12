@@ -14,8 +14,10 @@ namespace MJ.Input
         public event UnityAction printDiscardsEvent;
         public event UnityAction printTurnInfoEvent;
         public event UnityAction printCurrentHandEvent;
+        public event UnityAction<Vector2> discardEvent;
 
         private GameInput gameInput;
+        private Vector2 position;
 
         private void OnEnable()
         {
@@ -68,6 +70,16 @@ namespace MJ.Input
         {
             if (context.phase == InputActionPhase.Performed)
                 printCurrentHandEvent?.Invoke();
+        }
+
+        public void OnPoint(InputAction.CallbackContext context) {
+            position = context.ReadValue<Vector2>();
+        }
+
+        public void OnDiscard(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                discardEvent?.Invoke(position);
         }
 
         // Enable/Disable Action Maps

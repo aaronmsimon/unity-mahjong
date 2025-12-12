@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MJ.Core;
+using MJ.Testing;
 
 namespace MJ.Visuals
 {
@@ -19,6 +20,9 @@ namespace MJ.Visuals
 
         [Tooltip("Horizontal spacing between tiles.")]
         [SerializeField] private float tileSpacing = 1.1f;
+
+        [Tooltip("Reference to the debug controller that will handle clicks.")]
+        [SerializeField] private MahjongDebugController debugController;
 
         private readonly List<TileView> _tileViews = new List<TileView>();
 
@@ -59,6 +63,23 @@ namespace MJ.Visuals
                 }
             }
             _tileViews.Clear();
+        }
+
+        private void HandleTileClicked(TileView tv)
+        {
+            if (debugController == null)
+            {
+                Debug.LogWarning("[HandView] No debugController assigned to handle tile clicks.");
+                return;
+            }
+
+            if (tv.Instance == null)
+            {
+                Debug.LogWarning("[HandView] Clicked tile has no instance bound.");
+                return;
+            }
+
+            debugController.OnTileClickedFromHand(seatIndex, tv.Instance);
         }
     }
 }

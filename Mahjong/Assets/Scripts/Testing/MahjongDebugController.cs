@@ -5,6 +5,7 @@ using MJ.Game;
 using MJ.Rules;
 using MJ.Player;
 using MJ.Visuals;
+using MJ.Core;
 
 namespace MJ.Testing
 {
@@ -405,6 +406,61 @@ namespace MJ.Testing
                 var player = State.GetPlayer(seat);
                 hv.RenderHand(player.Hand);
             }
+        }
+
+        /// <summary>
+        /// Called by HandView when a TileView is clicked.
+        /// Attempts to discard that tile via the RuleEngine.
+        /// </summary>
+        public void OnTileClickedFromHand(int seatIndex, TileInstance tile)
+        {
+            if (State == null)
+            {
+                Debug.Log("[MahjongDebug] No active GameState. Start a round first.");
+                return;
+            }
+
+            if (State.IsRoundOver)
+            {
+                Debug.Log("[MahjongDebug] Round is already over; ignoring tile click.");
+                return;
+            }
+
+            if (seatIndex != State.CurrentSeat)
+            {
+                Debug.Log($"[MahjongDebug] Clicked tile in seat {seatIndex}, but it's not their turn (CurrentSeat = {State.CurrentSeat}).");
+                return;
+            }
+
+            if (State.TurnPhase != TurnPhase.Discard)
+            {
+                Debug.Log($"[MahjongDebug] Clicked tile in seat {seatIndex}, but current phase is {State.TurnPhase}, not Discard.");
+                return;
+            }
+
+            var player = State.GetPlayer(seatIndex);
+            if (!player.Hand.Contains(tile))
+            {
+                Debug.LogWarning("[MahjongDebug] Clicked tile is not in this player's hand (unexpected).");
+                return;
+            }
+
+            // Get legal actions and find the matching discard
+            var actions = RuleEngine.GetLegalActions(State, seatIndex);
+            var discardAction = actions.Find(a => a.Type == ActionType.Discard && a.Tile == tile);
+
+            if (discardAction == null)
+            {
+                Debug.LogWarning("[MahjongDebug] No matching Discard action found for this tile (unexpected).");
+                return;
+            }
+
+            Debug.Log($"[MahjongDebug] Applying discard via click: {discardAction}");
+            RuleEngine.ApplyAction(State, discardAction);
+
+            RefreshAllHandViews();
+            PrintDiscards();
+            PrintTurnInfo();
         }
     }
 }
