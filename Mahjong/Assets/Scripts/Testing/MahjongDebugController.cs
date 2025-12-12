@@ -4,6 +4,7 @@ using MJ.Input;
 using MJ.Game;
 using MJ.Rules;
 using MJ.Player;
+using MJ.Visuals;
 
 namespace MJ.Testing
 {
@@ -39,6 +40,10 @@ namespace MJ.Testing
         [Tooltip("Seat used by keyboard shortcuts like ForceDraw/ForceDiscard for quick testing.")]
         [Range(0, 3)]
         public int debugSeat = 0;
+
+        [Header("Visuals")]
+        [Tooltip("Hand views for seats 0..3")]
+        [SerializeField] private HandView[] handViews;
 
         [Header("Input")]
         [SerializeField] private InputReader inputReader;
@@ -85,6 +90,7 @@ namespace MJ.Testing
             Debug.Log($"[MahjongDebug] Started new round. Dealer seat: {dealerSeat}, Seed: {(seed?.ToString() ?? "random")}");
             PrintHands();
             PrintWallCount();
+            RefreshAllHandViews();
         }
 
         [ContextMenu("Print Hands")]
@@ -283,9 +289,10 @@ namespace MJ.Testing
             RuleEngine.ApplyAction(State, draw);
 
             // Show updated hand for that seat
-            var player = State.GetPlayer(State.CurrentSeat);
-            var tiles = string.Join(", ", player.Hand.Select(t => t.Type.ToString()));
-            Debug.Log($"[MahjongDebug] Seat {player.SeatIndex} hand after draw ({player.Hand.Count}): {tiles}");
+            // var player = State.GetPlayer(State.CurrentSeat);
+            // var tiles = string.Join(", ", player.Hand.Select(t => t.Type.ToString()));
+            // Debug.Log($"[MahjongDebug] Seat {player.SeatIndex} hand after draw ({player.Hand.Count}): {tiles}");
+            RefreshAllHandViews();
             PrintTurnInfo();
         }
 
@@ -332,7 +339,7 @@ namespace MJ.Testing
 
             Debug.Log($"[MahjongDebug] Applying action: {discardAction}");
             RuleEngine.ApplyAction(State, discardAction);
-
+            RefreshAllHandViews();
             PrintDiscards();
             PrintTurnInfo();
         }
@@ -379,10 +386,25 @@ namespace MJ.Testing
 
             Debug.Log($"[MahjongDebug] Applying action: {winAction}");
             RuleEngine.ApplyAction(State, winAction);
-
-            Debug.Log($"[MahjongDebug] Seat {seat} has declared win! Round over = {State.IsRoundOver}, WinnerSeat = {State.WinnerSeat}.");
+            RefreshAllHandViews();
             PrintHands();
             PrintDiscards();
+            Debug.Log($"[MahjongDebug] Seat {seat} has declared win! Round over = {State.IsRoundOver}, WinnerSeat = {State.WinnerSeat}.");
+        }
+
+        private void RefreshAllHandViews()
+        {
+            if (State == null || handViews == null)
+                return;
+
+            for (int seat = 0; seat < State.Players.Count && seat < handViews.Length; seat++)
+            {
+                HandView hv = handViews[seat];
+                if (hv == null) continue;
+
+                var player = State.GetPlayer(seat);
+                hv.RenderHand(player.Hand);
+            }
         }
     }
 }

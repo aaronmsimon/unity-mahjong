@@ -31,7 +31,13 @@ namespace MJ.Core
             _lookup = new Dictionary<TileType, Sprite>();
             foreach (var e in entries)
             {
-                var type = new TileType(e.suit, e.rank, e.wind, e.dragon);
+                TileType type = e.suit switch
+                {
+                    Suit.Winds   => TileType.WindTile(e.wind),
+                    Suit.Dragons => TileType.DragonTile(e.dragon),
+                    _            => TileType.Suited(e.suit, e.rank),
+                };
+                
                 if (!_lookup.ContainsKey(type))
                 {
                     _lookup.Add(type, e.sprite);

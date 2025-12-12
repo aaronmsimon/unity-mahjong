@@ -51,9 +51,19 @@ namespace MJ.Core
         public override bool Equals(object obj) =>
             obj is TileType other && Equals(other);
 
-        public override int GetHashCode() =>
-            HashCode.Combine(Suit, Rank, Wind, Dragon);
-
+        // public override int GetHashCode() =>
+        //     HashCode.Combine(Suit, Rank, Wind, Dragon);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = (int)Suit;
+                hash = hash * 31 + Rank;
+                hash = hash * 31 + (Wind.HasValue ? ((int)Wind.Value + 1) : 0);
+                hash = hash * 31 + (Dragon.HasValue ? ((int)Dragon.Value + 1) : 0);
+                return hash;
+            }
+        }
         // Useful for logging/debugging
         public override string ToString() {
             return Suit switch {
