@@ -25,7 +25,7 @@ namespace MJ.Core
         public Wind? Wind { get; }
         public Dragon? Dragon { get; }
 
-        private TileType(Suit suit, int rank, Wind? wind = null, Dragon? dragon = null) {
+        public TileType(Suit suit, int rank, Wind? wind = null, Dragon? dragon = null) {
             Suit = suit;
             Rank = rank;
             Wind = wind;

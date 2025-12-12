@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace MJ.Input
 {
-    [CreateAssetMenu(fileName = "InputReader", menuName = "Game/Input Reader")]
+    [CreateAssetMenu(fileName = "InputReader", menuName = "Mahjong/Input Reader")]
     public class InputReader : ScriptableObject, GameInput.IDebugActions
     {
         // Debug
