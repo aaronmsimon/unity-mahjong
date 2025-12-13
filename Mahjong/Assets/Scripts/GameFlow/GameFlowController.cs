@@ -20,6 +20,9 @@ namespace MJ.GameFlow
         [SerializeField] private GameStateManager stateManager;
         [SerializeField] private GameEvents gameEvents;
 
+        [Header("UI References")]
+        [SerializeField] private MJ.UI.PlayerHandController playerHandController; // Human player (Player 0)
+
         [Header("Configuration")]
         [SerializeField] private bool enableDebugLogging = true;
 
@@ -31,6 +34,9 @@ namespace MJ.GameFlow
 
         // Current game state
         private List<TileInstance> discardPile;
+        
+        // Track if waiting for player input
+        private bool waitingForPlayerDiscard = false;
 
         private void Awake()
         {
@@ -55,6 +61,14 @@ namespace MJ.GameFlow
                 gameEvents.OnGameStarted.AddListener(OnGameStarted);
                 gameEvents.OnHandStarted.AddListener(OnHandStarted);
                 gameEvents.OnTurnChanged.AddListener(OnTurnChanged);
+            }
+
+            // Setup player hand controller
+            if (playerHandController != null)
+            {
+                playerHandController.SetPlayerIndex(0); // Player 0 is human
+                playerHandController.SetHand(playerHands[0]);
+                playerHandController.GetHandView().OnTileDiscarded += OnPlayerDiscardedTile;
             }
         }
 
@@ -214,6 +228,12 @@ namespace MJ.GameFlow
             DebugLog($"Player {currentPlayer} drew: {drawnTile.Data}");
             DebugLog($"Tiles in wall: {wall.DrawPileCount}");
 
+            // Update UI if this is the human player
+            if (currentPlayer == 0 && playerHandController != null)
+            {
+                playerHandController.GetHandView().RefreshDisplay();
+            }
+
             // Check for win on draw
             if (HandEvaluator.CheckBasicWinPattern(playerHands[currentPlayer], meldsRequired: 4))
             {
@@ -228,7 +248,18 @@ namespace MJ.GameFlow
             // Show hand
             ShowPlayerHand(currentPlayer);
             
-            DebugLog($"Player {currentPlayer} must discard. Use 'Next Turn' to auto-discard.");
+            // Handle discard based on player type
+            if (currentPlayer == 0)
+            {
+                // Human player - wait for them to click discard
+                DebugLog($"Player {currentPlayer}: Select a tile and click Discard");
+                waitingForPlayerDiscard = true;
+            }
+            else
+            {
+                // AI player - auto discard for now
+                DebugLog($"Player {currentPlayer} must discard. Use 'Next Turn' to auto-discard.");
+            }
         }
 
         /// <summary>
@@ -291,6 +322,39 @@ namespace MJ.GameFlow
         {
             stateManager.NextTurn();
             DrawTileForCurrentPlayer();
+        }
+
+        #endregion
+
+        #region Player Input Handlers
+
+        private void OnPlayerDiscardedTile(TileInstance tile)
+        {
+            if (!waitingForPlayerDiscard)
+            {
+                DebugLog("Not waiting for player discard");
+                return;
+            }
+
+            int currentPlayer = stateManager.GetCurrentTurn();
+            if (currentPlayer != 0)
+            {
+                DebugLog("Not player 0's turn");
+                return;
+            }
+
+            waitingForPlayerDiscard = false;
+
+            // The tile was already removed from hand by HandView
+            // Just add to discard pile and advance
+            discardPile.Add(tile);
+            DebugLog($"Player {currentPlayer} discarded: {tile.Data}");
+
+            // Record discard
+            stateManager.SetLastDiscardPlayer(currentPlayer);
+
+            // Advance turn
+            AdvanceToNextPlayer();
         }
 
         #endregion
