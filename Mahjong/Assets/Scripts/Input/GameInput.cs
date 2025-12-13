@@ -93,7 +93,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             ""id"": ""a3add73f-336a-4f4e-a7dc-0b3cb9d44001"",
             ""actions"": [
                 {
-                    ""name"": ""StartNewRound"",
+                    ""name"": ""StartNewGame"",
                     ""type"": ""Button"",
                     ""id"": ""cc2ff1e7-8a1e-402a-9dfa-f1b982055c0f"",
                     ""expectedControlType"": """",
@@ -102,7 +102,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PrintHands"",
+                    ""name"": ""NextTurn"",
                     ""type"": ""Button"",
                     ""id"": ""ab235483-ff81-4405-a9de-dfc8176e8673"",
                     ""expectedControlType"": """",
@@ -111,7 +111,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PrintWallCount"",
+                    ""name"": ""PrintHands"",
                     ""type"": ""Button"",
                     ""id"": ""7ec3bb47-62bc-4f33-8286-0ae8cb25f8d2"",
                     ""expectedControlType"": """",
@@ -120,49 +120,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PrintDiscards"",
+                    ""name"": ""PrintGameState"",
                     ""type"": ""Button"",
                     ""id"": ""70c10dcb-ba2f-463d-8481-6579a4ab6eae"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""PrintTurnInfo"",
-                    ""type"": ""Button"",
-                    ""id"": ""95ebbc7a-4080-4ae8-9184-1a22c9f9f55f"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""PrintCurrentHand"",
-                    ""type"": ""Button"",
-                    ""id"": ""8032378c-e89f-4b90-8abd-8a2ff82dd0e5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Discard"",
-                    ""type"": ""Button"",
-                    ""id"": ""07336072-5f42-44fb-b87b-3224ba83d686"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Point"",
-                    ""type"": ""Value"",
-                    ""id"": ""164025d9-a8e3-4797-84dd-fe1ee2530926"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -173,7 +137,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""StartNewRound"",
+                    ""action"": ""StartNewGame"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -184,7 +148,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PrintHands"",
+                    ""action"": ""NextTurn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -195,7 +159,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PrintWallCount"",
+                    ""action"": ""PrintHands"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -206,51 +170,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PrintDiscards"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""380b90a5-d0e5-483e-8839-2fb21f76f753"",
-                    ""path"": ""<Keyboard>/f5"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PrintTurnInfo"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""543693b7-ab12-4140-b7ff-167af627b0d4"",
-                    ""path"": ""<Keyboard>/f6"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PrintCurrentHand"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""452e5f99-8658-401a-b6b6-aa72e36a30ea"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Discard"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4be02dc5-2e0b-4299-bc4f-1c8055949c61"",
-                    ""path"": ""<Mouse>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Point"",
+                    ""action"": ""PrintGameState"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -261,14 +181,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
 }");
         // Debug
         m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
-        m_Debug_StartNewRound = m_Debug.FindAction("StartNewRound", throwIfNotFound: true);
+        m_Debug_StartNewGame = m_Debug.FindAction("StartNewGame", throwIfNotFound: true);
+        m_Debug_NextTurn = m_Debug.FindAction("NextTurn", throwIfNotFound: true);
         m_Debug_PrintHands = m_Debug.FindAction("PrintHands", throwIfNotFound: true);
-        m_Debug_PrintWallCount = m_Debug.FindAction("PrintWallCount", throwIfNotFound: true);
-        m_Debug_PrintDiscards = m_Debug.FindAction("PrintDiscards", throwIfNotFound: true);
-        m_Debug_PrintTurnInfo = m_Debug.FindAction("PrintTurnInfo", throwIfNotFound: true);
-        m_Debug_PrintCurrentHand = m_Debug.FindAction("PrintCurrentHand", throwIfNotFound: true);
-        m_Debug_Discard = m_Debug.FindAction("Discard", throwIfNotFound: true);
-        m_Debug_Point = m_Debug.FindAction("Point", throwIfNotFound: true);
+        m_Debug_PrintGameState = m_Debug.FindAction("PrintGameState", throwIfNotFound: true);
     }
 
     ~@GameInput()
@@ -349,14 +265,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     // Debug
     private readonly InputActionMap m_Debug;
     private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
-    private readonly InputAction m_Debug_StartNewRound;
+    private readonly InputAction m_Debug_StartNewGame;
+    private readonly InputAction m_Debug_NextTurn;
     private readonly InputAction m_Debug_PrintHands;
-    private readonly InputAction m_Debug_PrintWallCount;
-    private readonly InputAction m_Debug_PrintDiscards;
-    private readonly InputAction m_Debug_PrintTurnInfo;
-    private readonly InputAction m_Debug_PrintCurrentHand;
-    private readonly InputAction m_Debug_Discard;
-    private readonly InputAction m_Debug_Point;
+    private readonly InputAction m_Debug_PrintGameState;
     /// <summary>
     /// Provides access to input actions defined in input action map "Debug".
     /// </summary>
@@ -369,37 +281,21 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public DebugActions(@GameInput wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Debug/StartNewRound".
+        /// Provides access to the underlying input action "Debug/StartNewGame".
         /// </summary>
-        public InputAction @StartNewRound => m_Wrapper.m_Debug_StartNewRound;
+        public InputAction @StartNewGame => m_Wrapper.m_Debug_StartNewGame;
+        /// <summary>
+        /// Provides access to the underlying input action "Debug/NextTurn".
+        /// </summary>
+        public InputAction @NextTurn => m_Wrapper.m_Debug_NextTurn;
         /// <summary>
         /// Provides access to the underlying input action "Debug/PrintHands".
         /// </summary>
         public InputAction @PrintHands => m_Wrapper.m_Debug_PrintHands;
         /// <summary>
-        /// Provides access to the underlying input action "Debug/PrintWallCount".
+        /// Provides access to the underlying input action "Debug/PrintGameState".
         /// </summary>
-        public InputAction @PrintWallCount => m_Wrapper.m_Debug_PrintWallCount;
-        /// <summary>
-        /// Provides access to the underlying input action "Debug/PrintDiscards".
-        /// </summary>
-        public InputAction @PrintDiscards => m_Wrapper.m_Debug_PrintDiscards;
-        /// <summary>
-        /// Provides access to the underlying input action "Debug/PrintTurnInfo".
-        /// </summary>
-        public InputAction @PrintTurnInfo => m_Wrapper.m_Debug_PrintTurnInfo;
-        /// <summary>
-        /// Provides access to the underlying input action "Debug/PrintCurrentHand".
-        /// </summary>
-        public InputAction @PrintCurrentHand => m_Wrapper.m_Debug_PrintCurrentHand;
-        /// <summary>
-        /// Provides access to the underlying input action "Debug/Discard".
-        /// </summary>
-        public InputAction @Discard => m_Wrapper.m_Debug_Discard;
-        /// <summary>
-        /// Provides access to the underlying input action "Debug/Point".
-        /// </summary>
-        public InputAction @Point => m_Wrapper.m_Debug_Point;
+        public InputAction @PrintGameState => m_Wrapper.m_Debug_PrintGameState;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -426,30 +322,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
-            @StartNewRound.started += instance.OnStartNewRound;
-            @StartNewRound.performed += instance.OnStartNewRound;
-            @StartNewRound.canceled += instance.OnStartNewRound;
+            @StartNewGame.started += instance.OnStartNewGame;
+            @StartNewGame.performed += instance.OnStartNewGame;
+            @StartNewGame.canceled += instance.OnStartNewGame;
+            @NextTurn.started += instance.OnNextTurn;
+            @NextTurn.performed += instance.OnNextTurn;
+            @NextTurn.canceled += instance.OnNextTurn;
             @PrintHands.started += instance.OnPrintHands;
             @PrintHands.performed += instance.OnPrintHands;
             @PrintHands.canceled += instance.OnPrintHands;
-            @PrintWallCount.started += instance.OnPrintWallCount;
-            @PrintWallCount.performed += instance.OnPrintWallCount;
-            @PrintWallCount.canceled += instance.OnPrintWallCount;
-            @PrintDiscards.started += instance.OnPrintDiscards;
-            @PrintDiscards.performed += instance.OnPrintDiscards;
-            @PrintDiscards.canceled += instance.OnPrintDiscards;
-            @PrintTurnInfo.started += instance.OnPrintTurnInfo;
-            @PrintTurnInfo.performed += instance.OnPrintTurnInfo;
-            @PrintTurnInfo.canceled += instance.OnPrintTurnInfo;
-            @PrintCurrentHand.started += instance.OnPrintCurrentHand;
-            @PrintCurrentHand.performed += instance.OnPrintCurrentHand;
-            @PrintCurrentHand.canceled += instance.OnPrintCurrentHand;
-            @Discard.started += instance.OnDiscard;
-            @Discard.performed += instance.OnDiscard;
-            @Discard.canceled += instance.OnDiscard;
-            @Point.started += instance.OnPoint;
-            @Point.performed += instance.OnPoint;
-            @Point.canceled += instance.OnPoint;
+            @PrintGameState.started += instance.OnPrintGameState;
+            @PrintGameState.performed += instance.OnPrintGameState;
+            @PrintGameState.canceled += instance.OnPrintGameState;
         }
 
         /// <summary>
@@ -461,30 +345,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="DebugActions" />
         private void UnregisterCallbacks(IDebugActions instance)
         {
-            @StartNewRound.started -= instance.OnStartNewRound;
-            @StartNewRound.performed -= instance.OnStartNewRound;
-            @StartNewRound.canceled -= instance.OnStartNewRound;
+            @StartNewGame.started -= instance.OnStartNewGame;
+            @StartNewGame.performed -= instance.OnStartNewGame;
+            @StartNewGame.canceled -= instance.OnStartNewGame;
+            @NextTurn.started -= instance.OnNextTurn;
+            @NextTurn.performed -= instance.OnNextTurn;
+            @NextTurn.canceled -= instance.OnNextTurn;
             @PrintHands.started -= instance.OnPrintHands;
             @PrintHands.performed -= instance.OnPrintHands;
             @PrintHands.canceled -= instance.OnPrintHands;
-            @PrintWallCount.started -= instance.OnPrintWallCount;
-            @PrintWallCount.performed -= instance.OnPrintWallCount;
-            @PrintWallCount.canceled -= instance.OnPrintWallCount;
-            @PrintDiscards.started -= instance.OnPrintDiscards;
-            @PrintDiscards.performed -= instance.OnPrintDiscards;
-            @PrintDiscards.canceled -= instance.OnPrintDiscards;
-            @PrintTurnInfo.started -= instance.OnPrintTurnInfo;
-            @PrintTurnInfo.performed -= instance.OnPrintTurnInfo;
-            @PrintTurnInfo.canceled -= instance.OnPrintTurnInfo;
-            @PrintCurrentHand.started -= instance.OnPrintCurrentHand;
-            @PrintCurrentHand.performed -= instance.OnPrintCurrentHand;
-            @PrintCurrentHand.canceled -= instance.OnPrintCurrentHand;
-            @Discard.started -= instance.OnDiscard;
-            @Discard.performed -= instance.OnDiscard;
-            @Discard.canceled -= instance.OnDiscard;
-            @Point.started -= instance.OnPoint;
-            @Point.performed -= instance.OnPoint;
-            @Point.canceled -= instance.OnPoint;
+            @PrintGameState.started -= instance.OnPrintGameState;
+            @PrintGameState.performed -= instance.OnPrintGameState;
+            @PrintGameState.canceled -= instance.OnPrintGameState;
         }
 
         /// <summary>
@@ -526,12 +398,19 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     public interface IDebugActions
     {
         /// <summary>
-        /// Method invoked when associated input action "StartNewRound" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "StartNewGame" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnStartNewRound(InputAction.CallbackContext context);
+        void OnStartNewGame(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "NextTurn" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnNextTurn(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "PrintHands" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -540,46 +419,11 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPrintHands(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "PrintWallCount" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "PrintGameState" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPrintWallCount(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "PrintDiscards" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPrintDiscards(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "PrintTurnInfo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPrintTurnInfo(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "PrintCurrentHand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPrintCurrentHand(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Discard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDiscard(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPoint(InputAction.CallbackContext context);
+        void OnPrintGameState(InputAction.CallbackContext context);
     }
 }

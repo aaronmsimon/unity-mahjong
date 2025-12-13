@@ -8,16 +8,12 @@ namespace MJ.Input
     public class InputReader : ScriptableObject, GameInput.IDebugActions
     {
         // Debug
-        public event UnityAction startNewRoundEvent;
+        public event UnityAction startNewGameEvent;
+        public event UnityAction nextTurnEvent;
         public event UnityAction printHandsEvent;
-        public event UnityAction printWallCountEvent;
-        public event UnityAction printDiscardsEvent;
-        public event UnityAction printTurnInfoEvent;
-        public event UnityAction printCurrentHandEvent;
-        public event UnityAction<Vector2> discardEvent;
+        public event UnityAction printGameStateEvent;
 
         private GameInput gameInput;
-        private Vector2 position;
 
         private void OnEnable()
         {
@@ -36,10 +32,16 @@ namespace MJ.Input
         }
 
         // Debug Events
-        public void OnStartNewRound(InputAction.CallbackContext context)
+        public void OnStartNewGame(InputAction.CallbackContext context)
         {
             if (context.phase == InputActionPhase.Performed)
-                startNewRoundEvent?.Invoke();
+                startNewGameEvent?.Invoke();
+        }
+
+        public void OnNextTurn(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+                nextTurnEvent?.Invoke();
         }
 
         public void OnPrintHands(InputAction.CallbackContext context)
@@ -48,38 +50,10 @@ namespace MJ.Input
                 printHandsEvent?.Invoke();
         }
 
-        public void OnPrintWallCount(InputAction.CallbackContext context)
+        public void OnPrintGameState(InputAction.CallbackContext context)
         {
             if (context.phase == InputActionPhase.Performed)
-                printWallCountEvent?.Invoke();
-        }
-
-        public void OnPrintDiscards(InputAction.CallbackContext context)
-        {
-            if (context.phase == InputActionPhase.Performed)
-                printDiscardsEvent?.Invoke();
-        }
-
-        public void OnPrintTurnInfo(InputAction.CallbackContext context)
-        {
-            if (context.phase == InputActionPhase.Performed)
-                printTurnInfoEvent?.Invoke();
-        }
-
-        public void OnPrintCurrentHand(InputAction.CallbackContext context)
-        {
-            if (context.phase == InputActionPhase.Performed)
-                printCurrentHandEvent?.Invoke();
-        }
-
-        public void OnPoint(InputAction.CallbackContext context) {
-            position = context.ReadValue<Vector2>();
-        }
-
-        public void OnDiscard(InputAction.CallbackContext context)
-        {
-            if (context.phase == InputActionPhase.Performed)
-                discardEvent?.Invoke(position);
+                printGameStateEvent?.Invoke();
         }
 
         // Enable/Disable Action Maps

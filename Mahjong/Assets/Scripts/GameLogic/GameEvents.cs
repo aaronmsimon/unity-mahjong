@@ -8,7 +8,7 @@ namespace MJ.GameLogic
     /// ScriptableObject-based event system for game state changes
     /// Decouples systems through events
     /// </summary>
-    [CreateAssetMenu(fileName = "GameEvents", menuName = "MJ/Game Events")]
+    [CreateAssetMenu(fileName = "GameEvents", menuName = "Mahjong/Game Events")]
     public class GameEvents : ScriptableObject
     {
         [Header("Game Lifecycle")]
