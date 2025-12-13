@@ -21,7 +21,7 @@ namespace MJ.GameFlow
         [SerializeField] private GameEvents gameEvents;
 
         [Header("UI References")]
-        [SerializeField] private MJ.UI.PlayerHandController playerHandController; // Human player (Player 0)
+        [SerializeField] private MJ.UI.TableLayoutView tableLayoutView;
 
         [Header("Configuration")]
         [SerializeField] private bool enableDebugLogging = true;
@@ -65,12 +65,14 @@ namespace MJ.GameFlow
                 gameEvents.OnTurnChanged.AddListener(OnTurnChanged);
             }
 
-            // Setup player hand controller
-            if (playerHandController != null)
+            // Setup table layout view
+            if (tableLayoutView != null)
             {
-                playerHandController.SetPlayerIndex(0); // Player 0 is human
-                playerHandController.SetHand(playerHands[0]);
-                playerHandController.GetHandView().OnTileDiscarded += OnPlayerDiscardedTile;
+                MJ.UI.HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
+                if (humanHandView != null)
+                {
+                    humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
+                }
             }
         }
 
@@ -158,6 +160,12 @@ namespace MJ.GameFlow
             // Update validator when turn changes
             actionValidator.UpdateGameState(stateManager.State);
             
+            // Update turn indicator
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.SetCurrentTurn(newPlayerIndex);
+            }
+            
             DebugLog($"Turn changed to Player {newPlayerIndex}");
         }
 
@@ -185,10 +193,22 @@ namespace MJ.GameFlow
                 playerHands[i].SortTiles();
 
                 DebugLog($"Player {i} final hand: {playerHands[i].ConcealedTileCount} tiles (+ {playerHands[i].GetBonusTiles().Count} bonus)");
+                
+                // Update display for this player
+                if (tableLayoutView != null)
+                {
+                    tableLayoutView.UpdatePlayerHand(i, playerHands[i]);
+                }
             }
 
             // Update state
             stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
+            
+            // Update player labels with wind positions
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.UpdatePlayerLabels(stateManager.State.DealerIndex);
+            }
         }
 
         /// <summary>
@@ -242,10 +262,10 @@ namespace MJ.GameFlow
             DebugLog($"Player {currentPlayer} drew: {drawnTile.Data}");
             DebugLog($"Tiles in wall: {wall.DrawPileCount}");
 
-            // Update UI if this is the human player
-            if (currentPlayer == 0 && playerHandController != null)
+            // Update UI for all players
+            if (tableLayoutView != null)
             {
-                playerHandController.GetHandView().RefreshDisplay();
+                tableLayoutView.UpdatePlayerHand(currentPlayer, playerHands[currentPlayer]);
             }
 
             // Check for win on draw
@@ -323,6 +343,12 @@ namespace MJ.GameFlow
             discardPile.Add(tileToDiscard);
 
             DebugLog($"Player {playerIndex} discarded: {tileToDiscard.Data}");
+
+            // Update discard pile display
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.AddDiscardedTile(tileToDiscard);
+            }
 
             // Record discard
             stateManager.SetLastDiscardPlayer(playerIndex);

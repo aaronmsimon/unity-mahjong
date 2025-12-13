@@ -12,6 +12,7 @@ namespace MJ.UI
     {
         [Header("Components")]
         [SerializeField] private Image tileImage;
+        [SerializeField] private Image tileBackground;
         [SerializeField] private Image backImage;  // For face-down tiles
         
         [Header("State")]
@@ -70,6 +71,8 @@ namespace MJ.UI
             {
                 backImage.gameObject.SetActive(!faceUp);
             }
+
+            tileBackground.gameObject.SetActive(faceUp);
         }
 
         /// <summary>
