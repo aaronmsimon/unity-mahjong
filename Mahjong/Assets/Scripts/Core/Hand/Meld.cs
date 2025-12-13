@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MJ.Core.Tiles;
+using MJ.Evaluation;
 
 namespace MJ.Core.Hand
 {
@@ -53,15 +54,10 @@ namespace MJ.Core.Hand
         /// <returns>A Pong meld, or null if invalid</returns>
         public static Meld CreatePong(List<TileInstance> tiles, TileInstance claimedTile = null, int? claimedFromPlayer = null)
         {
-            if (tiles == null || tiles.Count != 3)
+            // Use MeldValidator to check if tiles can form a Pong
+            if (!MeldValidator.CanFormPong(tiles))
             {
-                Debug.LogError($"Pong must have exactly 3 tiles, got {tiles?.Count ?? 0}");
-                return null;
-            }
-
-            if (!ValidatePong(tiles))
-            {
-                Debug.LogError("Invalid Pong: tiles are not all identical");
+                Debug.LogError($"Invalid Pong: tiles do not form a valid Pong");
                 return null;
             }
 
@@ -80,15 +76,10 @@ namespace MJ.Core.Hand
         public static Meld CreateKong(List<TileInstance> tiles, bool isConcealed = false, 
                                       TileInstance claimedTile = null, int? claimedFromPlayer = null)
         {
-            if (tiles == null || tiles.Count != 4)
+            // Use MeldValidator to check if tiles can form a Kong
+            if (!MeldValidator.CanFormKong(tiles))
             {
-                Debug.LogError($"Kong must have exactly 4 tiles, got {tiles?.Count ?? 0}");
-                return null;
-            }
-
-            if (!ValidateKong(tiles))
-            {
-                Debug.LogError("Invalid Kong: tiles are not all identical");
+                Debug.LogError($"Invalid Kong: tiles do not form a valid Kong");
                 return null;
             }
 
@@ -105,15 +96,10 @@ namespace MJ.Core.Hand
         /// <returns>A Chow meld, or null if invalid</returns>
         public static Meld CreateChow(List<TileInstance> tiles, TileInstance claimedTile = null, int? claimedFromPlayer = null)
         {
-            if (tiles == null || tiles.Count != 3)
+            // Use MeldValidator to check if tiles can form a Chow
+            if (!MeldValidator.CanFormChow(tiles))
             {
-                Debug.LogError($"Chow must have exactly 3 tiles, got {tiles?.Count ?? 0}");
-                return null;
-            }
-
-            if (!ValidateChow(tiles))
-            {
-                Debug.LogError("Invalid Chow: tiles do not form a valid sequence");
+                Debug.LogError($"Invalid Chow: tiles do not form a valid sequence");
                 return null;
             }
 
@@ -122,53 +108,6 @@ namespace MJ.Core.Hand
 
             // Chows are always exposed in standard rules
             return new Meld(MeldType.Chow, sortedTiles, false, claimedTile, claimedFromPlayer);
-        }
-
-        #endregion
-
-        #region Validation
-
-        /// <summary>
-        /// Validates that all tiles in a Pong are identical
-        /// </summary>
-        private static bool ValidatePong(List<TileInstance> tiles)
-        {
-            if (tiles.Count != 3) return false;
-
-            TileData first = tiles[0].Data;
-            return tiles.All(t => t.Data.IsSameType(first));
-        }
-
-        /// <summary>
-        /// Validates that all tiles in a Kong are identical
-        /// </summary>
-        private static bool ValidateKong(List<TileInstance> tiles)
-        {
-            if (tiles.Count != 4) return false;
-
-            TileData first = tiles[0].Data;
-            return tiles.All(t => t.Data.IsSameType(first));
-        }
-
-        /// <summary>
-        /// Validates that tiles form a valid Chow (sequence)
-        /// </summary>
-        private static bool ValidateChow(List<TileInstance> tiles)
-        {
-            if (tiles.Count != 3) return false;
-
-            // Can't form Chow with honor tiles
-            if (tiles.Any(t => t.Data.IsHonor())) return false;
-
-            // All tiles must be same suit
-            TileSuit suit = tiles[0].Data.Suit;
-            if (!tiles.All(t => t.Data.Suit == suit)) return false;
-
-            // Get numbers and sort them
-            List<int> numbers = tiles.Select(t => t.Data.Number).OrderBy(n => n).ToList();
-
-            // Check if they form a consecutive sequence
-            return numbers[1] == numbers[0] + 1 && numbers[2] == numbers[1] + 1;
         }
 
         #endregion
@@ -270,7 +209,8 @@ namespace MJ.Core.Hand
                 return false;
             }
 
-            if (!newTile.Data.IsSameType(Tiles[0].Data))
+            // Use MeldValidator to check if upgrade is valid
+            if (!MeldValidator.CanUpgradePongToKong(Tiles[0].Data, newTile.Data))
             {
                 Debug.LogError("New tile doesn't match the Pong");
                 return false;
