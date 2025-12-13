@@ -64,15 +64,15 @@ namespace MJ.UI
                     break;
                 case 1:
                     if (rightPlayerHand != null)
-                        rightPlayerHand.UpdateHandDisplay(hand.ConcealedTileCount);
+                        rightPlayerHand.DisplayHand(hand);
                     break;
                 case 2:
                     if (topPlayerHand != null)
-                        topPlayerHand.UpdateHandDisplay(hand.ConcealedTileCount);
+                        topPlayerHand.DisplayHand(hand);
                     break;
                 case 3:
                     if (leftPlayerHand != null)
-                        leftPlayerHand.UpdateHandDisplay(hand.ConcealedTileCount);
+                        leftPlayerHand.DisplayHand(hand);
                     break;
             }
         }

@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MJ.Core.Hand;
+using MJ.Core.Tiles;
 
 namespace MJ.UI
 {
     /// <summary>
     /// Displays an opponent's hand (face-down tiles)
-    /// Shows tile count but not actual tiles
+    /// Shows actual tiles but face-down
     /// </summary>
     public class OpponentHandView : MonoBehaviour
     {
@@ -19,7 +21,7 @@ namespace MJ.UI
         [SerializeField] private float tileSpacing = 70f;
         [SerializeField] private bool verticalLayout = false; // For left/right players
 
-        private List<GameObject> tileBackViews = new List<GameObject>();
+        private List<TileView> tileViews = new List<TileView>();
 
         private void Awake()
         {
@@ -30,21 +32,24 @@ namespace MJ.UI
         }
 
         /// <summary>
-        /// Updates the display to show the correct number of face-down tiles
+        /// Updates the display to show opponent's actual hand (face-down)
         /// </summary>
-        public void UpdateHandDisplay(int tileCount)
+        public void DisplayHand(Hand hand)
         {
             // Clear existing tiles
             ClearTiles();
 
-            // Create face-down tiles
-            for (int i = 0; i < tileCount; i++)
+            // Get concealed tiles
+            var tiles = hand.GetConcealedTiles();
+
+            // Create face-down tile for each
+            for (int i = 0; i < tiles.Count; i++)
             {
-                CreateFaceDownTile(i);
+                CreateFaceDownTile(tiles[i], i);
             }
         }
 
-        private void CreateFaceDownTile(int index)
+        private void CreateFaceDownTile(TileInstance tile, int index)
         {
             GameObject tileObj = Instantiate(tilePrefab, tileContainer);
             
@@ -64,17 +69,14 @@ namespace MJ.UI
                 }
             }
 
-            // Setup as face-down
+            // Get sprite (even though it won't be shown when face-down)
+            Sprite sprite = spriteLibrary != null ? spriteLibrary.GetSprite(tile.Data) : null;
+
+            // Setup as face-down - TileView handles showing the back!
             TileView tileView = tileObj.GetComponent<TileView>();
             if (tileView != null)
             {
-                // Use a dummy tile and show face-down
-                var dummyTile = new MJ.Core.Tiles.TileInstance(
-                    new MJ.Core.Tiles.TileData(MJ.Core.Tiles.TileSuit.Bamboo, 1, 1)
-                );
-                
-                Sprite backSprite = spriteLibrary != null ? spriteLibrary.TileBackSprite : null;
-                tileView.Setup(dummyTile, backSprite, faceUp: false);
+                tileView.Setup(tile, sprite, faceUp: false);
             }
 
             // Disable interaction
@@ -84,19 +86,19 @@ namespace MJ.UI
                 button.interactable = false;
             }
 
-            tileBackViews.Add(tileObj);
+            tileViews.Add(tileView);
         }
 
         private void ClearTiles()
         {
-            foreach (var tile in tileBackViews)
+            foreach (var tileView in tileViews)
             {
-                if (tile != null)
+                if (tileView != null)
                 {
-                    Destroy(tile);
+                    Destroy(tileView.gameObject);
                 }
             }
-            tileBackViews.Clear();
+            tileViews.Clear();
         }
 
         /// <summary>

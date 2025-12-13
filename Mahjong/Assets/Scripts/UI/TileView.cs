@@ -41,18 +41,10 @@ namespace MJ.UI
         public void Setup(TileInstance tile, Sprite sprite, bool faceUp = true)
         {
             tileInstance = tile;
-            isFaceUp = faceUp;
             
-            if (tileImage != null)
-            {
-                tileImage.sprite = sprite;
-                tileImage.gameObject.SetActive(faceUp);
-            }
-            
-            if (backImage != null)
-            {
-                backImage.gameObject.SetActive(!faceUp);
-            }
+            if (tileImage != null) tileImage.sprite = sprite;
+
+            SetFaceUp(faceUp);
         }
 
         /// <summary>
@@ -62,15 +54,8 @@ namespace MJ.UI
         {
             isFaceUp = faceUp;
             
-            if (tileImage != null)
-            {
-                tileImage.gameObject.SetActive(faceUp);
-            }
-            
-            if (backImage != null)
-            {
-                backImage.gameObject.SetActive(!faceUp);
-            }
+            if (tileImage != null) tileImage.gameObject.SetActive(faceUp);
+            if (backImage != null) backImage.gameObject.SetActive(!faceUp);
 
             tileBackground.gameObject.SetActive(faceUp);
         }
