@@ -114,6 +114,7 @@ namespace MJ.Core.Hand
         /// </summary>
         public void SortTiles()
         {
+            Debug.Log($"There are {concealedTiles.Count} tiles to sort");
             concealedTiles = concealedTiles
                 .OrderBy(t => t.Data.Suit)
                 .ThenBy(t => t.Data.Number)

@@ -25,6 +25,8 @@ namespace MJ.GameFlow
 
         [Header("Configuration")]
         [SerializeField] private bool enableDebugLogging = true;
+        [SerializeField] private bool useRandomSeed = true;
+        [SerializeField] private int shuffleSeed = 12345; // Used when useRandomSeed is false
 
         // Game components
         private Wall wall;
@@ -124,7 +126,18 @@ namespace MJ.GameFlow
             
             // Create and shuffle tiles
             List<TileInstance> allTiles = TileFactory.CreateFullTileSet(includeFlowersAndSeasons: true);
-            TileFactory.ShuffleTiles(allTiles);
+            
+            // Shuffle with seed if specified
+            if (useRandomSeed)
+            {
+                TileFactory.ShuffleTiles(allTiles);
+                DebugLog("Shuffled with random seed");
+            }
+            else
+            {
+                TileFactory.ShuffleTiles(allTiles, shuffleSeed);
+                DebugLog($"Shuffled with seed: {shuffleSeed}");
+            }
 
             // Create wall
             wall = new Wall(allTiles, deadWallSize: 14);
@@ -223,6 +236,7 @@ namespace MJ.GameFlow
 
             // Add the non-bonus tile to hand
             playerHands[currentPlayer].AddTile(drawnTile);
+            playerHands[currentPlayer].SortTiles();
             stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
 
             DebugLog($"Player {currentPlayer} drew: {drawnTile.Data}");

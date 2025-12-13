@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using MJ.Core.Tiles;
 using MJ.Core.Hand;
 using MJ.GameLogic;
@@ -99,7 +100,7 @@ namespace MJ.UI
             discardButton.interactable = canDiscard;
 
             // Update button text
-            Text buttonText = discardButton.GetComponentInChildren<Text>();
+            TMP_Text buttonText = discardButton.GetComponentInChildren<TMP_Text>();
             if (buttonText != null)
             {
                 if (!IsPlayerTurn())

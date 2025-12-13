@@ -7,8 +7,8 @@ namespace MJ.Core.Tiles
     /// </summary>
     public enum TileSuit
     {
-        Bamboo,      // 索子 (1-9)
         Characters,  // 萬子 (1-9)
+        Bamboo,      // 索子 (1-9)
         Dots,        // 筒子 (1-9)
         Wind,        // 風牌 (East, South, West, North)
         Dragon,      // 三元牌 (Red, Green, White)

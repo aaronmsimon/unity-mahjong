@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using MJ.Core.Tiles;
 
 namespace MJ.Core.Tiles
 {
@@ -125,14 +126,32 @@ namespace MJ.Core.Tiles
         /// <summary>
         /// Shuffles a list of tiles using Fisher-Yates algorithm
         /// </summary>
-        public static void ShuffleTiles(List<TileInstance> tiles)
+        /// <param name="tiles">List of tiles to shuffle in-place</param>
+        /// <param name="seed">Optional seed for reproducible shuffles. If null, uses Unity's Random.</param>
+        public static void ShuffleTiles(List<TileInstance> tiles, int? seed = null)
         {
-            for (int i = tiles.Count - 1; i > 0; i--)
+            // Use System.Random if seed is provided, otherwise use Unity's Random
+            if (seed.HasValue)
             {
-                int randomIndex = Random.Range(0, i + 1);
-                TileInstance temp = tiles[i];
-                tiles[i] = tiles[randomIndex];
-                tiles[randomIndex] = temp;
+                System.Random rng = new System.Random(seed.Value);
+                for (int i = tiles.Count - 1; i > 0; i--)
+                {
+                    int randomIndex = rng.Next(0, i + 1);
+                    TileInstance temp = tiles[i];
+                    tiles[i] = tiles[randomIndex];
+                    tiles[randomIndex] = temp;
+                }
+            }
+            else
+            {
+                // Use Unity's Random for normal gameplay
+                for (int i = tiles.Count - 1; i > 0; i--)
+                {
+                    int randomIndex = Random.Range(0, i + 1);
+                    TileInstance temp = tiles[i];
+                    tiles[i] = tiles[randomIndex];
+                    tiles[randomIndex] = temp;
+                }
             }
         }
 
