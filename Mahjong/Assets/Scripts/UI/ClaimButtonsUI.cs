@@ -19,6 +19,7 @@ namespace MJ.UI
         [SerializeField] private Button passButton;
 
         [Header("Display")]
+        [SerializeField] private GameObject claimPanel;
         [SerializeField] private TMP_Text discardedTileText;
         [SerializeField] private float claimWindowDuration = 5f; // Seconds to claim
 
@@ -70,7 +71,8 @@ namespace MJ.UI
         /// </summary>
         public void ShowClaimOptions(TileData discardedTile, bool canPong, bool canKong, bool canChow, bool canWin)
         {
-            gameObject.SetActive(true);
+            if (claimPanel != null)
+                claimPanel.SetActive(true);
 
             // Update discarded tile display
             if (discardedTileText != null)
@@ -100,7 +102,8 @@ namespace MJ.UI
         /// </summary>
         public void HideClaimPanel()
         {
-            gameObject.SetActive(false);
+            if (claimPanel != null)
+                claimPanel.SetActive(false);
 
             isClaimWindowOpen = false;
         }

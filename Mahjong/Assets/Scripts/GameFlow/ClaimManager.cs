@@ -13,7 +13,6 @@ namespace MJ.GameFlow
     {
         [Header("References")]
         [SerializeField] private GameStateManager stateManager;
-        [SerializeField] private ActionValidator actionValidator;
 
         [Header("Configuration")]
         [SerializeField] private float claimWindowDuration = 5f;
@@ -24,6 +23,9 @@ namespace MJ.GameFlow
         private int lastDiscardPlayerIndex;
         private List<PendingClaim> pendingClaims;
         private float claimWindowTimer;
+        
+        // Reference to action validator (set by GameFlowController)
+        private ActionValidator actionValidator;
 
         // Events
         public System.Action<TileInstance, int> OnClaimWindowOpened; // tile, discarder index
@@ -33,6 +35,14 @@ namespace MJ.GameFlow
         private void Awake()
         {
             pendingClaims = new List<PendingClaim>();
+        }
+
+        /// <summary>
+        /// Sets the action validator (called by GameFlowController)
+        /// </summary>
+        public void SetActionValidator(ActionValidator validator)
+        {
+            actionValidator = validator;
         }
 
         private void Update()

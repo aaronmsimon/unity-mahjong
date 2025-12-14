@@ -7,6 +7,7 @@ using MJ.Core.Wall;
 using MJ.GameLogic;
 using MJ.Rules;
 using MJ.Evaluation;
+using MJ.UI;
 
 namespace MJ.GameFlow
 {
@@ -21,7 +22,9 @@ namespace MJ.GameFlow
         [SerializeField] private GameEvents gameEvents;
 
         [Header("UI References")]
-        [SerializeField] private MJ.UI.TableLayoutView tableLayoutView;
+        [SerializeField] private TableLayoutView tableLayoutView;
+        [SerializeField] private ClaimButtonsUI claimButtonsUI;
+        [SerializeField] private ClaimManager claimManager;
 
         [Header("Configuration")]
         [SerializeField] private bool enableDebugLogging = true;
@@ -68,11 +71,30 @@ namespace MJ.GameFlow
             // Setup table layout view
             if (tableLayoutView != null)
             {
-                MJ.UI.HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
+                HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
                 if (humanHandView != null)
                 {
                     humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
                 }
+            }
+
+            // Setup claim manager
+            if (claimManager != null)
+            {
+                claimManager.SetActionValidator(actionValidator);
+                claimManager.OnClaimWindowOpened += OnClaimWindowOpened;
+                claimManager.OnClaimWindowClosed += OnClaimWindowClosed;
+                claimManager.OnClaimResolved += OnClaimResolved;
+            }
+
+            // Setup claim buttons UI
+            if (claimButtonsUI != null)
+            {
+                claimButtonsUI.OnPongClaimed += () => OnPlayerClaim(ClaimType.Pong);
+                claimButtonsUI.OnKongClaimed += () => OnPlayerClaim(ClaimType.Kong);
+                claimButtonsUI.OnChowClaimed += () => OnPlayerClaim(ClaimType.Chow);
+                claimButtonsUI.OnWinClaimed += () => OnPlayerClaim(ClaimType.Win);
+                claimButtonsUI.OnPassClaimed += OnPlayerPass;
             }
         }
 
@@ -364,9 +386,16 @@ namespace MJ.GameFlow
             // Record discard
             stateManager.SetLastDiscardPlayer(playerIndex);
 
-            // For now, skip claim window and just advance turn
-            // In full implementation, would open claim window here
-            AdvanceToNextPlayer();
+            // Open claim window instead of immediately advancing
+            if (claimManager != null)
+            {
+                claimManager.OpenClaimWindow(tileToDiscard, playerIndex);
+            }
+            else
+            {
+                // No claim manager - just advance
+                AdvanceToNextPlayer();
+            }
         }
 
         private void AdvanceToNextPlayer()
@@ -406,6 +435,258 @@ namespace MJ.GameFlow
 
             // Advance turn
             AdvanceToNextPlayer();
+        }
+
+        #endregion
+
+        #region Claiming
+
+        private void OnClaimWindowOpened(TileInstance discardedTile, int discardPlayerIndex)
+        {
+            DebugLog($"Claim window opened for {discardedTile.Data} from Player {discardPlayerIndex}");
+
+            // Check what player 0 (human) can claim
+            ClaimOptions options = claimManager.GetValidClaims(0, discardedTile.Data, playerHands[0]);
+
+            DebugLog($"Claim options: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}");
+
+            // Show claim UI for human player
+            if (claimButtonsUI != null /*&& options.HasAnyClaim*/)
+            {
+                claimButtonsUI.ShowClaimOptions(
+                    discardedTile.Data,
+                    options.CanPong,
+                    options.CanKong,
+                    options.CanChow,
+                    options.CanWin
+                );
+            }
+            // else if (claimButtonsUI != null)
+            // {
+            //     // Can't claim anything - auto-pass
+            //     DebugLog("Player 0 cannot claim - auto-passing");
+            //     claimManager.SubmitPass(0);
+            // }
+            else
+            {
+                DebugLog("ERROR: claimButtonsUI is null!");
+            }
+
+            // TODO: Check AI players and auto-claim for them
+            // For now, they auto-pass
+        }
+
+        private void OnClaimWindowClosed() {
+            AdvanceToNextPlayer();
+        }
+
+        private void OnPlayerClaim(ClaimType claimType)
+        {
+            DebugLog($"Player 0 claiming {claimType}");
+            claimManager.SubmitClaim(0, claimType);
+        }
+
+        private void OnPlayerPass()
+        {
+            DebugLog("Player 0 passed");
+            claimManager.SubmitPass(0);
+        }
+
+        private void OnClaimResolved(int winnerIndex, ClaimType claimType, TileInstance claimedTile)
+        {
+            DebugLog($"Claim resolved: Player {winnerIndex} claimed {claimType} with {claimedTile.Data}");
+
+            // Form the meld based on claim type
+            switch (claimType)
+            {
+                case ClaimType.Pong:
+                    FormPongFromClaim(winnerIndex, claimedTile);
+                    break;
+                case ClaimType.Kong:
+                    FormKongFromClaim(winnerIndex, claimedTile);
+                    break;
+                case ClaimType.Chow:
+                    FormChowFromClaim(winnerIndex, claimedTile);
+                    break;
+                case ClaimType.Win:
+                    HandleWinFromClaim(winnerIndex, claimedTile);
+                    return; // Don't continue - game ends
+            }
+
+            // Update display
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.UpdatePlayerHand(winnerIndex, playerHands[winnerIndex]);
+            }
+
+            // Claimer's turn
+            stateManager.SetTurn(winnerIndex);
+            waitingForPlayerDiscard = (winnerIndex == 0);
+
+            if (winnerIndex != 0)
+            {
+                // AI player - auto discard for now
+                DebugLog($"Player {winnerIndex} must discard after claim");
+            }
+        }
+
+        private void FormPongFromClaim(int playerIndex, TileInstance claimedTile)
+        {
+            Hand hand = playerHands[playerIndex];
+
+            // Find 2 matching tiles in hand
+            var concealedTiles = new List<TileInstance>(hand.GetConcealedTiles());
+            var matchingTiles = concealedTiles
+                .Where(t => t.Data.IsSameType(claimedTile.Data))
+                .Take(2)
+                .ToList();
+
+            if (matchingTiles.Count < 2)
+            {
+                DebugLog("ERROR: Not enough tiles to form Pong!");
+                return;
+            }
+
+            // Create meld
+            var meldTiles = new List<TileInstance>(matchingTiles);
+            meldTiles.Add(claimedTile);
+
+            Meld pong = Meld.CreatePong(meldTiles, claimedTile, stateManager.State.LastDiscardPlayerIndex);
+
+            if (pong != null)
+            {
+                // Remove tiles from hand
+                foreach (var tile in matchingTiles)
+                {
+                    hand.RemoveTile(tile);
+                }
+
+                // Add exposed meld
+                hand.AddExposedMeld(pong);
+
+                DebugLog($"Player {playerIndex} formed Pong: {pong}");
+            }
+        }
+
+        private void FormKongFromClaim(int playerIndex, TileInstance claimedTile)
+        {
+            Hand hand = playerHands[playerIndex];
+
+            // Find 3 matching tiles in hand
+            var concealedTiles = new List<TileInstance>(hand.GetConcealedTiles());
+            var matchingTiles = concealedTiles
+                .Where(t => t.Data.IsSameType(claimedTile.Data))
+                .Take(3)
+                .ToList();
+
+            if (matchingTiles.Count < 3)
+            {
+                DebugLog("ERROR: Not enough tiles to form Kong!");
+                return;
+            }
+
+            // Create meld
+            var meldTiles = new List<TileInstance>(matchingTiles);
+            meldTiles.Add(claimedTile);
+
+            Meld kong = Meld.CreateKong(meldTiles, false, claimedTile, stateManager.State.LastDiscardPlayerIndex);
+
+            if (kong != null)
+            {
+                // Remove tiles from hand
+                foreach (var tile in matchingTiles)
+                {
+                    hand.RemoveTile(tile);
+                }
+
+                // Add exposed meld
+                hand.AddExposedMeld(kong);
+
+                DebugLog($"Player {playerIndex} formed Kong: {kong}");
+
+                // Draw replacement tile
+                TileInstance replacement = wall.DrawReplacementTile();
+                if (replacement != null)
+                {
+                    hand.AddTile(replacement);
+                    hand.SortTiles();
+                    DebugLog($"Player {playerIndex} drew replacement: {replacement.Data}");
+                }
+            }
+        }
+
+        private void FormChowFromClaim(int playerIndex, TileInstance claimedTile)
+        {
+            Hand hand = playerHands[playerIndex];
+
+            // Find tiles to complete the sequence
+            var concealedTiles = new List<TileInstance>(hand.GetConcealedTiles());
+            
+            // Try to find a valid chow combination
+            List<TileInstance> chowTiles = FindChowTiles(concealedTiles, claimedTile);
+
+            if (chowTiles == null || chowTiles.Count != 3)
+            {
+                DebugLog("ERROR: Cannot form valid Chow!");
+                return;
+            }
+
+            Meld chow = Meld.CreateChow(chowTiles, claimedTile, stateManager.State.LastDiscardPlayerIndex);
+
+            if (chow != null)
+            {
+                // Remove tiles from hand (excluding claimed tile)
+                foreach (var tile in chowTiles)
+                {
+                    if (tile != claimedTile)
+                    {
+                        hand.RemoveTile(tile);
+                    }
+                }
+
+                // Add exposed meld
+                hand.AddExposedMeld(chow);
+
+                DebugLog($"Player {playerIndex} formed Chow: {chow}");
+            }
+        }
+
+        private List<TileInstance> FindChowTiles(List<TileInstance> concealedTiles, TileInstance claimedTile)
+        {
+            if (claimedTile.Data.IsHonor()) return null;
+
+            int claimedNum = claimedTile.Data.Number;
+            TileSuit suit = claimedTile.Data.Suit;
+
+            // Try pattern: n-2, n-1, n (claimed is highest)
+            var tile1 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum - 2);
+            var tile2 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum - 1);
+            if (tile1 != null && tile2 != null)
+                return new List<TileInstance> { tile1, tile2, claimedTile };
+
+            // Try pattern: n-1, n, n+1 (claimed is middle)
+            tile1 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum - 1);
+            tile2 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum + 1);
+            if (tile1 != null && tile2 != null)
+                return new List<TileInstance> { tile1, claimedTile, tile2 };
+
+            // Try pattern: n, n+1, n+2 (claimed is lowest)
+            tile1 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum + 1);
+            tile2 = concealedTiles.FirstOrDefault(t => t.Data.Suit == suit && t.Data.Number == claimedNum + 2);
+            if (tile1 != null && tile2 != null)
+                return new List<TileInstance> { claimedTile, tile1, tile2 };
+
+            return null;
+        }
+
+        private void HandleWinFromClaim(int winnerIndex, TileInstance claimedTile)
+        {
+            DebugLog($"★★★ Player {winnerIndex} WINS by claiming {claimedTile.Data}! ★★★");
+            
+            bool dealerWon = stateManager.State.IsDealer(winnerIndex);
+            stateManager.CompleteHand(winnerIndex, dealerWon);
+
+            // TODO: Show win UI with scoring
         }
 
         #endregion

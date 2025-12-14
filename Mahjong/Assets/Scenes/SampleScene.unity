@@ -762,7 +762,6 @@ GameObject:
   - component: {fileID: 461799045}
   - component: {fileID: 461799048}
   - component: {fileID: 461799047}
-  - component: {fileID: 461799046}
   m_Layer: 5
   m_Name: ClaimPanel
   m_TagString: Untagged
@@ -777,7 +776,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 461799044}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -789,32 +788,13 @@ RectTransform:
   - {fileID: 2135630929}
   - {fileID: 469157676}
   - {fileID: 579525839}
-  m_Father: {fileID: 943375756}
+  m_Father: {fileID: 1221328195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 600, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &461799046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 461799044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c95fd5c8bd21534aa207d55aeec78a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.ClaimButtonsUI
-  pongButton: {fileID: 796761157}
-  kongButton: {fileID: 469157677}
-  chowButton: {fileID: 2135630930}
-  winButton: {fileID: 579525840}
-  passButton: {fileID: 492806089}
-  discardedTileText: {fileID: 1641618086}
-  claimWindowDuration: 5
 --- !u!114 &461799047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2373,7 +2353,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1598714067}
-  - {fileID: 461799045}
+  - {fileID: 1221328195}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2436,6 +2416,52 @@ MonoBehaviour:
   tileContainer: {fileID: 1376972762}
   tileSpacing: 70
   verticalLayout: 0
+--- !u!1 &955659733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 955659735}
+  - component: {fileID: 955659734}
+  m_Layer: 0
+  m_Name: ClaimManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &955659734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955659733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15bf589eab20f264d913d988a4fbbe29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.GameFlow.ClaimManager
+  stateManager: {fileID: 2030213244}
+  claimWindowDuration: 5
+--- !u!4 &955659735
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955659733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &990926161
 GameObject:
   m_ObjectHideFlags: 0
@@ -2844,6 +2870,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145795425}
   m_CullTransparentMesh: 1
+--- !u!1 &1221328194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1221328195}
+  - component: {fileID: 1221328196}
+  m_Layer: 5
+  m_Name: ClaimUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1221328195
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221328194}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 461799045}
+  m_Father: {fileID: 943375756}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1221328196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221328194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c95fd5c8bd21534aa207d55aeec78a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.ClaimButtonsUI
+  pongButton: {fileID: 796761157}
+  kongButton: {fileID: 469157677}
+  chowButton: {fileID: 2135630930}
+  winButton: {fileID: 579525840}
+  passButton: {fileID: 492806089}
+  claimPanel: {fileID: 461799044}
+  discardedTileText: {fileID: 1641618086}
+  claimWindowDuration: 5
 --- !u!1 &1250343726
 GameObject:
   m_ObjectHideFlags: 0
@@ -3737,6 +3820,8 @@ MonoBehaviour:
   stateManager: {fileID: 2030213244}
   gameEvents: {fileID: 11400000, guid: 07aa92552e583f6428e2ed567bf2eb6f, type: 2}
   tableLayoutView: {fileID: 1598714068}
+  claimButtonsUI: {fileID: 1221328196}
+  claimManager: {fileID: 955659734}
   enableDebugLogging: 1
   useRandomSeed: 0
   shuffleSeed: 12345
@@ -3903,4 +3988,5 @@ SceneRoots:
   - {fileID: 943375756}
   - {fileID: 297801786}
   - {fileID: 2030213245}
+  - {fileID: 955659735}
   - {fileID: 819190442}
