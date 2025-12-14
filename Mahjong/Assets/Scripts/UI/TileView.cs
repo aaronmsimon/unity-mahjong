@@ -15,8 +15,7 @@ namespace MJ.UI
         [SerializeField] private Image tileBackground;
         [SerializeField] private Image backImage;  // For face-down tiles
         
-        [Header("State")]
-        [SerializeField] private bool isFaceUp = true;
+        public bool isFaceUp { get; private set; }
         
         // Reference to the tile data this view represents
         private TileInstance tileInstance;

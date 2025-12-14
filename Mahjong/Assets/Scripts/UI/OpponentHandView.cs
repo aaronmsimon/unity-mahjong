@@ -65,7 +65,21 @@ namespace MJ.UI
                 else
                 {
                     // Horizontal layout for top player
-                    rectTransform.anchoredPosition = new Vector2(index * tileSpacing, 0);
+            float totalSpace = tileContainer.GetComponent<RectTransform>().rect.width;
+            int maxHandSize = 14;
+            float tileSizeNoSpacing = totalSpace / maxHandSize;
+            float percentSpacing = 0.01f;
+            float tileSpacing = tileSizeNoSpacing * percentSpacing;
+            float tileSizeWithSpacing = (totalSpace - tileSpacing * (maxHandSize - 1)) / maxHandSize;
+            float spacing = tileSpacing + tileSizeWithSpacing;
+                    rectTransform.anchoredPosition = new Vector2(index * spacing, 0);
+                    float scale = tileSizeWithSpacing / tilePrefab.GetComponent<RectTransform>().rect.width;
+                    rectTransform.localScale = new Vector3(scale, scale, 1);
+                    // rectTransform.anchoredPosition = new Vector2(index * tileSpacing, 0);
+
+            rectTransform.anchorMin = new Vector3(0, 0.5f, 1);
+            rectTransform.anchorMax = new Vector3(0, 0.5f, 1);
+            rectTransform.pivot = new Vector3(0, 0.5f, 1);
                 }
             }
 

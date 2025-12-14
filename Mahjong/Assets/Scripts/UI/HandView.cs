@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using MJ.Core.Hand;
 using MJ.Core.Tiles;
+using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
 
 namespace MJ.UI
 {
@@ -16,14 +18,10 @@ namespace MJ.UI
         [SerializeField] private TileSpriteLibrarySO spriteLibrary;
         [SerializeField] private GameObject tilePrefab;
         [SerializeField] private Transform tileContainer;
+        [SerializeField] private Transform bonusTileContainer;
 
         [Header("Layout")]
-        [SerializeField] private float tileSpacing = 80f;
         [SerializeField] private float selectedOffset = 20f; // How much selected tile moves up
-
-        [Header("Bonus Tiles")]
-        [SerializeField] private Transform bonusTileContainer;
-        [SerializeField] private float bonusTileSpacing = 60f;
 
         // Current hand being displayed
         private Hand currentHand;
@@ -79,7 +77,7 @@ namespace MJ.UI
             // Create tile view for each
             for (int i = 0; i < tiles.Count; i++)
             {
-                TileView tileView = CreateTileView(tiles[i], tileContainer, i, tileSpacing);
+                TileView tileView = CreateTileView(tiles[i], tileContainer, i);
                 tileView.OnTileClicked += OnTileClicked;
                 concealedTileViews.Add(tileView);
             }
@@ -98,18 +96,29 @@ namespace MJ.UI
             // Create tile view for each
             for (int i = 0; i < bonusTiles.Count; i++)
             {
-                TileView tileView = CreateTileView(bonusTiles[i], bonusTileContainer, i, bonusTileSpacing);
+                TileView tileView = CreateTileView(bonusTiles[i], bonusTileContainer, i);
                 // Bonus tiles are not clickable
                 bonusTileViews.Add(tileView);
             }
         }
 
-        private TileView CreateTileView(TileInstance tile, Transform parent, int index, float spacing)
+        private TileView CreateTileView(TileInstance tile, Transform parent, int index)
         {
             GameObject tileObj = Instantiate(tilePrefab, parent);
+            float totalSpace = parent.GetComponent<RectTransform>().rect.width;
+            int maxHandSize = 14;
+            float tileSizeNoSpacing = totalSpace / maxHandSize;
+            float percentSpacing = 0.01f;
+            float tileSpacing = tileSizeNoSpacing * percentSpacing;
+            float tileSizeWithSpacing = (totalSpace - tileSpacing * (maxHandSize - 1)) / maxHandSize;
+            float spacing = tileSpacing + tileSizeWithSpacing;
             
             // Position
             RectTransform rectTransform = tileObj.GetComponent<RectTransform>();
+            // rectTransform.localScale = new Vector3(.5f, .5f, 1);
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.zero;
+            rectTransform.pivot = Vector2.zero;
             if (rectTransform != null)
             {
                 rectTransform.anchoredPosition = new Vector2(index * spacing, 0);

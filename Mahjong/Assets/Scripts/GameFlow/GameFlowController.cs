@@ -120,6 +120,11 @@ namespace MJ.GameFlow
             
             // Start first hand
             stateManager.StartNewHand();
+
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.SetCurrentTurn(0);
+            }
         }
 
         private void OnHandStarted()
@@ -343,6 +348,12 @@ namespace MJ.GameFlow
             discardPile.Add(tileToDiscard);
 
             DebugLog($"Player {playerIndex} discarded: {tileToDiscard.Data}");
+
+            // Update Displayed Hand
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.UpdatePlayerHand(playerIndex, hand);
+            }
 
             // Update discard pile display
             if (tableLayoutView != null)
