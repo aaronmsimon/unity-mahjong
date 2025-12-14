@@ -429,6 +429,11 @@ namespace MJ.GameFlow
             // Just add to discard pile and advance
             discardPile.Add(tile);
             DebugLog($"Player {currentPlayer} discarded: {tile.Data}");
+            // Update discard pile display
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.AddDiscardedTile(tile);
+            }
 
             // Record discard
             stateManager.SetLastDiscardPlayer(currentPlayer);
@@ -451,7 +456,7 @@ namespace MJ.GameFlow
             DebugLog($"Claim options: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}");
 
             // Show claim UI for human player
-            if (claimButtonsUI != null /*&& options.HasAnyClaim*/)
+            if (claimButtonsUI != null && options.HasAnyClaim)
             {
                 claimButtonsUI.ShowClaimOptions(
                     discardedTile.Data,
@@ -461,12 +466,12 @@ namespace MJ.GameFlow
                     options.CanWin
                 );
             }
-            // else if (claimButtonsUI != null)
-            // {
-            //     // Can't claim anything - auto-pass
-            //     DebugLog("Player 0 cannot claim - auto-passing");
-            //     claimManager.SubmitPass(0);
-            // }
+            else if (claimButtonsUI != null)
+            {
+                // Can't claim anything - auto-pass
+                DebugLog("Player 0 cannot claim - auto-passing");
+                claimManager.SubmitPass(0);
+            }
             else
             {
                 DebugLog("ERROR: claimButtonsUI is null!");
