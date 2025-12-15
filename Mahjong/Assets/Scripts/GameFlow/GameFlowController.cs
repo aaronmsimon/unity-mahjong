@@ -45,6 +45,9 @@ namespace MJ.GameFlow
         
         // Track if waiting for player input
         private bool waitingForPlayerDiscard = false;
+        
+        // Random number generator for AI (seeded for reproducibility)
+        private System.Random aiRandom;
 
         private void Awake()
         {
@@ -122,11 +125,24 @@ namespace MJ.GameFlow
             int currentPlayer = stateManager.GetCurrentTurn();
             Hand hand = playerHands[currentPlayer];
             
-            // Get a tile to discard (just take the last one for now)
+            // Get a tile to discard - use seeded random for AI
             var tiles = new List<TileInstance>(hand.GetConcealedTiles());
             if (tiles.Count > 0)
             {
-                TileInstance tileToDiscard = tiles[tiles.Count - 1];
+                TileInstance tileToDiscard;
+                
+                if (aiRandom != null)
+                {
+                    // Use seeded random (reproducible)
+                    int randomIndex = aiRandom.Next(0, tiles.Count);
+                    tileToDiscard = tiles[randomIndex];
+                }
+                else
+                {
+                    // Fallback to last tile
+                    tileToDiscard = tiles[tiles.Count - 1];
+                }
+                
                 DiscardTile(currentPlayer, tileToDiscard);
             }
             else
@@ -161,16 +177,22 @@ namespace MJ.GameFlow
             DebugLog($"TileFactory: Created {allTiles.Count} tiles", debugController.TileCreation);
             
             // Shuffle with seed if specified
+            int currentSeed;
             if (useRandomSeed)
             {
+                currentSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
                 TileFactory.ShuffleTiles(allTiles);
                 DebugLog("Shuffled with random seed", true);
             }
             else
             {
+                currentSeed = shuffleSeed;
                 TileFactory.ShuffleTiles(allTiles, shuffleSeed);
                 DebugLog($"Shuffled with seed: {shuffleSeed}", debugController.Shuffle);
             }
+            
+            // Initialize AI random with same seed (for reproducible AI behavior)
+            aiRandom = new System.Random(currentSeed);
 
             // Create wall
             wall = new Wall(allTiles, deadWallSize: 14);
