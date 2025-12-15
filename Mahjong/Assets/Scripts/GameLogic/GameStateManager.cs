@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using MJ.Core.Tiles;
+using MJ.Testing;
 
 namespace MJ.GameLogic
 {
@@ -22,6 +23,9 @@ namespace MJ.GameLogic
 
         [Header("Current State (Read-Only)")]
         [SerializeField, TextArea(3, 10)] private string currentStateDebug;
+
+        [Header("Debug")]
+        [SerializeField] private DebugControllerSO debugController;
 
         // Current immutable state
         private GameState currentState;
@@ -68,7 +72,7 @@ namespace MJ.GameLogic
             }
 
             UpdateDebugDisplay();
-            Debug.Log($"State Transition: {description}");
+            if (debugController.Transition) Debug.Log($"State Transition: {description}");
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace MJ.GameLogic
                 historyIndex--;
             }
 
-            Debug.Log($"History: {change}");
+            if (debugController.History) Debug.Log($"History: {change}");
         }
 
         #endregion

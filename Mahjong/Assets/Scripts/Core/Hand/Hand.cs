@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MJ.Core.Tiles;
+using MJ.Testing;
 
 namespace MJ.Core.Hand
 {
@@ -112,9 +113,9 @@ namespace MJ.Core.Hand
         /// Sorts concealed tiles by suit and number
         /// Order: Bamboo, Characters, Dots, Winds, Dragons
         /// </summary>
-        public void SortTiles()
+        public void SortTiles(bool enableLogging)
         {
-            Debug.Log($"There are {concealedTiles.Count} tiles to sort");
+            if (enableLogging) Debug.Log($"There are {concealedTiles.Count} tiles to sort");
             concealedTiles = concealedTiles
                 .OrderBy(t => t.Data.Suit)
                 .ThenBy(t => t.Data.Number)

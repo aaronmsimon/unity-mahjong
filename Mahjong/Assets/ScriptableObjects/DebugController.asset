@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32683758ec6d8f94ba6f368c716f615b, type: 3}
+  m_Name: DebugController
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.Testing.DebugControllerSO
+  sortTiles: 0
+  pongValidation: 0
+  kongValidation: 0
+  chowValidation: 0
+  kongConversion: 0
+  tileCreation: 0
+  wallCreation: 0
+  openClaimWindow: 0
+  submitClaim: 0
+  resolveClaim: 0
+  startGame: 0
+  startHand: 0
+  changeTurn: 0
+  dealHands: 0
+  bonusTileReplacement: 0
+  drawTile: 0
+  handleDiscard: 0
+  discardTile: 0
+  eventDiscardTile: 0
+  claimWindowOpened: 0
+  claimOptions: 0
+  claimDecision: 0
+  claimResolved: 0
+  claimPong: 0
+  claimKong: 0
+  claimChow: 0
+  claimWin: 0
+  transition: 0
+  history: 0
+  undo: 0
+  redo: 0
+  claimWindowOpenedUi: 0
+  buttonPong: 0
+  buttonKong: 0
+  buttonChow: 0
+  buttonWin: 0
+  buttonPass: 0
+  discardTileHv: 0
+  discardTilePhc: 0

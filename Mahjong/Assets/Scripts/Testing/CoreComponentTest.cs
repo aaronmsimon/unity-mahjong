@@ -115,7 +115,7 @@ namespace MJ.Testing
             Debug.Log($"Hand has {hand.ConcealedTileCount} tiles");
 
             // Test sorting
-            hand.SortTiles();
+            hand.SortTiles(true);
             Debug.Log("Hand sorted");
 
             // Test querying
@@ -187,7 +187,7 @@ namespace MJ.Testing
             // Create Hand objects and add tiles
             Hand player1Hand = new Hand();
             player1Hand.AddTiles(hands[0]);
-            player1Hand.SortTiles();
+            player1Hand.SortTiles(true);
             Debug.Log($"\nPlayer 1 hand after adding tiles:");
             Debug.Log($"  Concealed: {player1Hand.ConcealedTileCount}");
             Debug.Log($"  Bonus: {player1Hand.GetBonusTiles().Count}");

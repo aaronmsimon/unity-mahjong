@@ -37,7 +37,6 @@ namespace MJ.Core.Tiles
                 tiles.AddRange(CreateBonusTiles(ref nextTileId));
             }
 
-            Debug.Log($"TileFactory: Created {tiles.Count} tiles");
             return tiles;
         }
 

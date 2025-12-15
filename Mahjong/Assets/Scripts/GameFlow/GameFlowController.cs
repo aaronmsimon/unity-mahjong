@@ -8,6 +8,7 @@ using MJ.GameLogic;
 using MJ.Rules;
 using MJ.Evaluation;
 using MJ.UI;
+using MJ.Testing;
 
 namespace MJ.GameFlow
 {
@@ -27,9 +28,11 @@ namespace MJ.GameFlow
         [SerializeField] private ClaimManager claimManager;
 
         [Header("Configuration")]
-        [SerializeField] private bool enableDebugLogging = true;
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int shuffleSeed = 12345; // Used when useRandomSeed is false
+
+        [Header("Debug")]
+        [SerializeField] private DebugControllerSO debugController;
 
         // Game components
         private Wall wall;
@@ -128,7 +131,7 @@ namespace MJ.GameFlow
             }
             else
             {
-                DebugLog($"Player {currentPlayer} has no tiles to discard!");
+                DebugLog($"Player {currentPlayer} has no tiles to discard!", true);
             }
         }
 
@@ -138,7 +141,7 @@ namespace MJ.GameFlow
 
         private void OnGameStarted()
         {
-            DebugLog("=== GAME STARTED ===");
+            DebugLog("=== GAME STARTED ===", debugController.StartGame);
             
             // Start first hand
             stateManager.StartNewHand();
@@ -151,21 +154,22 @@ namespace MJ.GameFlow
 
         private void OnHandStarted()
         {
-            DebugLog("=== NEW HAND STARTED ===");
+            DebugLog("=== NEW HAND STARTED ===", debugController.StartHand);
             
             // Create and shuffle tiles
             List<TileInstance> allTiles = TileFactory.CreateFullTileSet(includeFlowersAndSeasons: true);
+            DebugLog($"TileFactory: Created {allTiles.Count} tiles", debugController.TileCreation);
             
             // Shuffle with seed if specified
             if (useRandomSeed)
             {
                 TileFactory.ShuffleTiles(allTiles);
-                DebugLog("Shuffled with random seed");
+                DebugLog("Shuffled with random seed", true);
             }
             else
             {
                 TileFactory.ShuffleTiles(allTiles, shuffleSeed);
-                DebugLog($"Shuffled with seed: {shuffleSeed}");
+                DebugLog($"Shuffled with seed: {shuffleSeed}", debugController.Shuffle);
             }
 
             // Create wall
@@ -193,7 +197,7 @@ namespace MJ.GameFlow
                 tableLayoutView.SetCurrentTurn(newPlayerIndex);
             }
             
-            DebugLog($"Turn changed to Player {newPlayerIndex}");
+            DebugLog($"Turn changed to Player {newPlayerIndex}", debugController.ChangeTurn);
         }
 
         #endregion
@@ -202,7 +206,7 @@ namespace MJ.GameFlow
 
         private void DealInitialHands()
         {
-            DebugLog("Dealing tiles to players...");
+            DebugLog("Dealing tiles to players...", debugController.DealHands);
 
             // Deal 13 tiles to each player
             var dealtHands = wall.DealInitialHands(playerCount: 4, tilesPerPlayer: 13);
@@ -217,9 +221,9 @@ namespace MJ.GameFlow
                     AddTileAndHandleBonuses(i, tile);
                 }
                 
-                playerHands[i].SortTiles();
+                playerHands[i].SortTiles(debugController.SortTiles);
 
-                DebugLog($"Player {i} final hand: {playerHands[i].ConcealedTileCount} tiles (+ {playerHands[i].GetBonusTiles().Count} bonus)");
+                DebugLog($"Player {i} final hand: {playerHands[i].ConcealedTileCount} tiles (+ {playerHands[i].GetBonusTiles().Count} bonus)", debugController.DealHands);
                 
                 // Update display for this player
                 if (tableLayoutView != null)
@@ -250,7 +254,7 @@ namespace MJ.GameFlow
             {
                 // Add bonus tile
                 playerHands[playerIndex].AddTile(tile);
-                DebugLog($"Player {playerIndex} got bonus tile: {tile.Data} - drawing replacement");
+                DebugLog($"Player {playerIndex} got bonus tile: {tile.Data} - drawing replacement", debugController.BonusTileReplacement);
                 
                 // Draw replacement from dead wall
                 TileInstance replacement = wall.DrawReplacementTile();
@@ -269,25 +273,25 @@ namespace MJ.GameFlow
         private void DrawTileForCurrentPlayer()
         {
             int currentPlayer = stateManager.GetCurrentTurn();
-            DebugLog($"\n--- Player {currentPlayer}'s Turn ---");
+            DebugLog($"\n--- Player {currentPlayer}'s Turn ---", debugController.ChangeTurn);
 
             // Draw a tile (and handle any bonus tiles)
             TileInstance drawnTile = DrawAndHandleBonusTiles(currentPlayer);
             
             if (drawnTile == null)
             {
-                DebugLog("Wall is empty! Hand ends in draw.");
+                DebugLog("Wall is empty! Hand ends in draw.", true);
                 stateManager.CompleteHand(winnerIndex: -1, dealerWon: false);
                 return;
             }
 
             // Add the non-bonus tile to hand
             playerHands[currentPlayer].AddTile(drawnTile);
-            playerHands[currentPlayer].SortTiles();
+            playerHands[currentPlayer].SortTiles(debugController.SortTiles);
             stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
 
-            DebugLog($"Player {currentPlayer} drew: {drawnTile.Data}");
-            DebugLog($"Tiles in wall: {wall.DrawPileCount}");
+            DebugLog($"Player {currentPlayer} drew: {drawnTile.Data}", debugController.DrawTile);
+            DebugLog($"Tiles in wall: {wall.DrawPileCount}", debugController.WallInfo);
 
             // Update UI for all players
             if (tableLayoutView != null)
@@ -298,7 +302,7 @@ namespace MJ.GameFlow
             // Check for win on draw
             if (HandEvaluator.CheckBasicWinPattern(playerHands[currentPlayer], meldsRequired: 4))
             {
-                DebugLog($"★★★ Player {currentPlayer} WINS on self-draw! ★★★");
+                DebugLog($"★★★ Player {currentPlayer} WINS on self-draw! ★★★", true);
                 playerHands[currentPlayer].DebugPrint();
                 
                 bool dealerWon = stateManager.State.IsDealer(currentPlayer);
@@ -313,13 +317,13 @@ namespace MJ.GameFlow
             if (currentPlayer == 0)
             {
                 // Human player - wait for them to click discard
-                DebugLog($"Player {currentPlayer}: Select a tile and click Discard");
+                DebugLog($"Player {currentPlayer}: Select a tile and click Discard", debugController.HandleDiscard);
                 waitingForPlayerDiscard = true;
             }
             else
             {
                 // AI player - auto discard for now
-                DebugLog($"Player {currentPlayer} must discard. Use 'Next Turn' to auto-discard.");
+                DebugLog($"Player {currentPlayer} must discard. Use 'Next Turn' to auto-discard.", debugController.HandleDiscard);
             }
         }
 
@@ -340,7 +344,7 @@ namespace MJ.GameFlow
             while (drawnTile != null && drawnTile.Data.IsBonus())
             {
                 playerHands[playerIndex].AddTile(drawnTile); // Hand will separate it automatically
-                DebugLog($"Player {playerIndex} drew bonus tile: {drawnTile.Data} - drawing replacement from dead wall");
+                DebugLog($"Player {playerIndex} drew bonus tile: {drawnTile.Data} - drawing replacement from dead wall", debugController.BonusTileReplacement);
                 
                 // Draw replacement from dead wall
                 drawnTile = wall.DrawReplacementTile();
@@ -361,7 +365,7 @@ namespace MJ.GameFlow
             var validation = actionValidator.CanDiscard(playerIndex, tileToDiscard.Data, hand);
             if (!validation.IsValid)
             {
-                DebugLog($"Cannot discard: {validation.Reason}");
+                DebugLog($"Cannot discard: {validation.Reason}", true);
                 return;
             }
 
@@ -369,7 +373,7 @@ namespace MJ.GameFlow
             hand.RemoveTile(tileToDiscard);
             discardPile.Add(tileToDiscard);
 
-            DebugLog($"Player {playerIndex} discarded: {tileToDiscard.Data}");
+            DebugLog($"Player {playerIndex} discarded: {tileToDiscard.Data}", debugController.DiscardTile);
 
             // Update Displayed Hand
             if (tableLayoutView != null)
@@ -412,14 +416,14 @@ namespace MJ.GameFlow
         {
             if (!waitingForPlayerDiscard)
             {
-                DebugLog("Not waiting for player discard");
+                DebugLog("Not waiting for player discard", debugController.DiscardTile);
                 return;
             }
 
             int currentPlayer = stateManager.GetCurrentTurn();
             if (currentPlayer != 0)
             {
-                DebugLog("Not player 0's turn");
+                DebugLog("Not player 0's turn", debugController.DiscardTile);
                 return;
             }
 
@@ -428,7 +432,7 @@ namespace MJ.GameFlow
             // The tile was already removed from hand by HandView
             // Just add to discard pile and advance
             discardPile.Add(tile);
-            DebugLog($"Player {currentPlayer} discarded: {tile.Data}");
+            DebugLog($"Player {currentPlayer} discarded: {tile.Data}", debugController.DiscardTile);
             // Update discard pile display
             if (tableLayoutView != null)
             {
@@ -448,12 +452,12 @@ namespace MJ.GameFlow
 
         private void OnClaimWindowOpened(TileInstance discardedTile, int discardPlayerIndex)
         {
-            DebugLog($"Claim window opened for {discardedTile.Data} from Player {discardPlayerIndex}");
+            DebugLog($"Claim window opened for {discardedTile.Data} from Player {discardPlayerIndex}", debugController.ClaimWindowOpened);
 
             // Check what player 0 (human) can claim
             ClaimOptions options = claimManager.GetValidClaims(0, discardedTile.Data, playerHands[0]);
 
-            DebugLog($"Claim options: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}");
+            DebugLog($"Claim options: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}", debugController.ClaimOptions);
 
             // Show claim UI for human player
             if (claimButtonsUI != null && options.HasAnyClaim)
@@ -469,12 +473,12 @@ namespace MJ.GameFlow
             else if (claimButtonsUI != null)
             {
                 // Can't claim anything - auto-pass
-                DebugLog("Player 0 cannot claim - auto-passing");
+                DebugLog("Player 0 cannot claim - auto-passing", debugController.ClaimDecision);
                 claimManager.SubmitPass(0);
             }
             else
             {
-                DebugLog("ERROR: claimButtonsUI is null!");
+                DebugLog("ERROR: claimButtonsUI is null!", debugController.ClaimDecision);
             }
 
             // TODO: Check AI players and auto-claim for them
@@ -487,19 +491,19 @@ namespace MJ.GameFlow
 
         private void OnPlayerClaim(ClaimType claimType)
         {
-            DebugLog($"Player 0 claiming {claimType}");
+            DebugLog($"Player 0 claiming {claimType}", debugController.ClaimDecision);
             claimManager.SubmitClaim(0, claimType);
         }
 
         private void OnPlayerPass()
         {
-            DebugLog("Player 0 passed");
+            DebugLog("Player 0 passed", debugController.ClaimDecision);
             claimManager.SubmitPass(0);
         }
 
         private void OnClaimResolved(int winnerIndex, ClaimType claimType, TileInstance claimedTile)
         {
-            DebugLog($"Claim resolved: Player {winnerIndex} claimed {claimType} with {claimedTile.Data}");
+            DebugLog($"Claim resolved: Player {winnerIndex} claimed {claimType} with {claimedTile.Data}", debugController.ClaimResolved);
 
             // Form the meld based on claim type
             switch (claimType)
@@ -531,7 +535,7 @@ namespace MJ.GameFlow
             if (winnerIndex != 0)
             {
                 // AI player - auto discard for now
-                DebugLog($"Player {winnerIndex} must discard after claim");
+                DebugLog($"Player {winnerIndex} must discard after claim", debugController.ClaimResolved);
             }
         }
 
@@ -548,7 +552,7 @@ namespace MJ.GameFlow
 
             if (matchingTiles.Count < 2)
             {
-                DebugLog("ERROR: Not enough tiles to form Pong!");
+                DebugLog("ERROR: Not enough tiles to form Pong!", debugController.ClaimPong);
                 return;
             }
 
@@ -569,7 +573,7 @@ namespace MJ.GameFlow
                 // Add exposed meld
                 hand.AddExposedMeld(pong);
 
-                DebugLog($"Player {playerIndex} formed Pong: {pong}");
+                DebugLog($"Player {playerIndex} formed Pong: {pong}", debugController.ClaimPong);
             }
         }
 
@@ -586,7 +590,7 @@ namespace MJ.GameFlow
 
             if (matchingTiles.Count < 3)
             {
-                DebugLog("ERROR: Not enough tiles to form Kong!");
+                DebugLog("ERROR: Not enough tiles to form Kong!", debugController.ClaimKong);
                 return;
             }
 
@@ -607,15 +611,15 @@ namespace MJ.GameFlow
                 // Add exposed meld
                 hand.AddExposedMeld(kong);
 
-                DebugLog($"Player {playerIndex} formed Kong: {kong}");
+                DebugLog($"Player {playerIndex} formed Kong: {kong}", debugController.ClaimKong);
 
                 // Draw replacement tile
                 TileInstance replacement = wall.DrawReplacementTile();
                 if (replacement != null)
                 {
                     hand.AddTile(replacement);
-                    hand.SortTiles();
-                    DebugLog($"Player {playerIndex} drew replacement: {replacement.Data}");
+                    hand.SortTiles(debugController.SortTiles);
+                    DebugLog($"Player {playerIndex} drew replacement: {replacement.Data}", debugController.BonusTileReplacement);
                 }
             }
         }
@@ -632,7 +636,7 @@ namespace MJ.GameFlow
 
             if (chowTiles == null || chowTiles.Count != 3)
             {
-                DebugLog("ERROR: Cannot form valid Chow!");
+                DebugLog("ERROR: Cannot form valid Chow!", debugController.ClaimChow);
                 return;
             }
 
@@ -652,7 +656,7 @@ namespace MJ.GameFlow
                 // Add exposed meld
                 hand.AddExposedMeld(chow);
 
-                DebugLog($"Player {playerIndex} formed Chow: {chow}");
+                DebugLog($"Player {playerIndex} formed Chow: {chow}", debugController.ClaimChow);
             }
         }
 
@@ -686,7 +690,7 @@ namespace MJ.GameFlow
 
         private void HandleWinFromClaim(int winnerIndex, TileInstance claimedTile)
         {
-            DebugLog($"★★★ Player {winnerIndex} WINS by claiming {claimedTile.Data}! ★★★");
+            DebugLog($"★★★ Player {winnerIndex} WINS by claiming {claimedTile.Data}! ★★★", debugController.ClaimWin);
             
             bool dealerWon = stateManager.State.IsDealer(winnerIndex);
             stateManager.CompleteHand(winnerIndex, dealerWon);
@@ -700,12 +704,10 @@ namespace MJ.GameFlow
 
         private void ShowPlayerHand(int playerIndex)
         {
-            if (!enableDebugLogging) return;
-
             Hand hand = playerHands[playerIndex];
             var tiles = hand.GetConcealedTiles();
             
-            DebugLog($"Player {playerIndex} hand ({tiles.Count} tiles):");
+            DebugLog($"Player {playerIndex} hand ({tiles.Count} tiles):", debugController.ShowHand);
             
             // Group by suit for easier reading
             var grouped = hand.GetTilesBySuit();
@@ -714,7 +716,7 @@ namespace MJ.GameFlow
                 if (kvp.Value.Count > 0)
                 {
                     string tilesStr = string.Join(", ", kvp.Value.Select(t => t.Data.ToCompactString()));
-                    DebugLog($"  {kvp.Key}: {tilesStr}");
+                    DebugLog($"  {kvp.Key}: {tilesStr}", debugController.ShowHand);
                 }
             }
             
@@ -723,13 +725,13 @@ namespace MJ.GameFlow
             if (bonusTiles.Count > 0)
             {
                 string bonusStr = string.Join(", ", bonusTiles.Select(t => t.Data.ToCompactString()));
-                DebugLog($"  Bonus: {bonusStr}");
+                DebugLog($"  Bonus: {bonusStr}", debugController.ShowHand);
             }
         }
 
-        private void DebugLog(string message)
+        private void DebugLog(string message, bool enabled)
         {
-            if (enableDebugLogging)
+            if (enabled)
             {
                 Debug.Log($"[GameFlow] {message}");
             }
@@ -744,7 +746,7 @@ namespace MJ.GameFlow
         {
             for (int i = 0; i < playerHands.Count; i++)
             {
-                DebugLog($"\n=== Player {i} ===");
+                DebugLog($"\n=== Player {i} ===", true);
                 ShowPlayerHand(i);
             }
         }
