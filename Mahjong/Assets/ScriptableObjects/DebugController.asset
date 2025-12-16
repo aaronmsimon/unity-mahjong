@@ -12,35 +12,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32683758ec6d8f94ba6f368c716f615b, type: 3}
   m_Name: DebugController
   m_EditorClassIdentifier: Assembly-CSharp::MJ.Testing.DebugControllerSO
-  sortTiles: 0
+  SortTiles: 0
   pongValidation: 0
   kongValidation: 0
   chowValidation: 0
   kongConversion: 0
-  tileCreation: 0
-  wallCreation: 0
+  TileCreation: 0
+  WallCreation: 0
   openClaimWindow: 0
   submitClaim: 0
   resolveClaim: 0
-  startGame: 0
-  startHand: 0
-  changeTurn: 0
-  dealHands: 0
-  bonusTileReplacement: 0
-  drawTile: 0
-  handleDiscard: 0
-  discardTile: 0
-  eventDiscardTile: 0
-  claimWindowOpened: 0
-  claimOptions: 0
-  claimDecision: 0
-  claimResolved: 0
-  claimPong: 0
-  claimKong: 0
-  claimChow: 0
-  claimWin: 0
-  transition: 0
-  history: 0
+  StartGame: 0
+  StartHand: 0
+  Shuffle: 0
+  ChangeTurn: 0
+  DealHands: 0
+  BonusTileReplacement: 0
+  ShowHand: 1
+  DrawTile: 0
+  WallInfo: 0
+  HandleDiscard: 0
+  DiscardTile: 0
+  ClaimWindowOpened: 0
+  ClaimOptions: 0
+  ClaimDecision: 0
+  ClaimResolved: 0
+  ClaimPong: 0
+  ClaimKong: 0
+  ClaimChow: 0
+  ClaimWin: 0
+  Transition: 0
+  History: 0
   undo: 0
   redo: 0
   claimWindowOpenedUi: 0

@@ -108,14 +108,25 @@ namespace MJ.UI
             // Create tile view
             GameObject tileObj = Instantiate(tilePrefab, discardPileContainer);
             RectTransform rectTransform = tileObj.GetComponent<RectTransform>();
+            // start opponent view
+            float totalSpace = discardPileContainer.GetComponent<RectTransform>().rect.width;
+            float tileSizeNoSpacing = totalSpace / discardTilesPerRow;
+            float percentSpacing = 0.01f;
+            float tileSpacing = tileSizeNoSpacing * percentSpacing;
+            float tileSizeWithSpacing = (totalSpace - tileSpacing * (discardTilesPerRow - 1)) / discardTilesPerRow;
+            float spacing = tileSpacing + tileSizeWithSpacing;
+            rectTransform.anchoredPosition = new Vector2(index * spacing, 0);
+            float scale = tileSizeWithSpacing / tilePrefab.GetComponent<RectTransform>().rect.width;
+            rectTransform.localScale = new Vector3(scale, scale, 1);
+            // end opponent view
             
-            if (rectTransform != null)
-            {
-                // Center the grid and offset from center
-                float xOffset = (col - discardTilesPerRow / 2f) * discardTileSpacing;
-                float yOffset = -row * discardTileSpacing;
-                rectTransform.anchoredPosition = new Vector2(xOffset, yOffset);
-            }
+            // if (rectTransform != null)
+            // {
+            //     // Center the grid and offset from center
+            //     float xOffset = (col - discardTilesPerRow / 2f) * discardTileSpacing;
+            //     float yOffset = -row * discardTileSpacing;
+            //     rectTransform.anchoredPosition = new Vector2(xOffset, yOffset);
+            // }
 
             // Get sprite and setup
             Sprite sprite = spriteLibrary.GetSprite(tile.Data);
@@ -124,10 +135,10 @@ namespace MJ.UI
             if (tileView != null)
             {
                 tileView.Setup(tile, sprite, faceUp: true);
-                // Disable button for discard pile tiles
-                Button button = tileObj.GetComponent<Button>();
-                if (button != null)
-                    button.interactable = false;
+            //     // Disable button for discard pile tiles
+            //     Button button = tileObj.GetComponent<Button>();
+            //     if (button != null)
+            //         button.interactable = false;
             }
 
             discardPileTileViews.Add(tileView);
