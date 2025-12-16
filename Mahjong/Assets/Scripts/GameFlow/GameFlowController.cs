@@ -9,6 +9,7 @@ using MJ.Rules;
 using MJ.Evaluation;
 using MJ.UI;
 using MJ.Testing;
+using MJ.Scoring;
 
 namespace MJ.GameFlow
 {
@@ -26,6 +27,7 @@ namespace MJ.GameFlow
         [SerializeField] private TableLayoutView tableLayoutView;
         [SerializeField] private ClaimButtonsUI claimButtonsUI;
         [SerializeField] private ClaimManager claimManager;
+        [SerializeField] private WinScreenUI winScreenUI;
 
         [Header("Configuration")]
         [SerializeField] private bool useRandomSeed = true;
@@ -39,6 +41,7 @@ namespace MJ.GameFlow
         private List<Hand> playerHands;
         private ActionValidator actionValidator;
         private IMahjongRuleSet ruleSet;
+        private IScoringSystem scoringSystem;
 
         // Current game state
         private List<TileInstance> discardPile;
@@ -56,6 +59,9 @@ namespace MJ.GameFlow
             
             // Initialize validator
             actionValidator = new ActionValidator(ruleSet);
+
+            // Initialize scoring system
+            scoringSystem = new HongKongScoring();
 
             // Initialize hands
             playerHands = new List<Hand>();
@@ -101,6 +107,13 @@ namespace MJ.GameFlow
                 claimButtonsUI.OnChowClaimed += () => OnPlayerClaim(ClaimType.Chow);
                 claimButtonsUI.OnWinClaimed += () => OnPlayerClaim(ClaimType.Win);
                 claimButtonsUI.OnPassClaimed += OnPlayerPass;
+            }
+
+            // Setup win screen UI
+            if (winScreenUI != null)
+            {
+                winScreenUI.OnNextHandClicked += StartNextHand;
+                winScreenUI.OnQuitClicked += QuitGame;
             }
         }
 
@@ -329,6 +342,9 @@ namespace MJ.GameFlow
                 
                 bool dealerWon = stateManager.State.IsDealer(currentPlayer);
                 stateManager.CompleteHand(winnerIndex: currentPlayer, dealerWon: dealerWon);
+                
+                // Calculate score and show win screen
+                ShowWinScreen(currentPlayer, playerHands[currentPlayer], isSelfDrawn: true);
                 return;
             }
 
@@ -714,10 +730,104 @@ namespace MJ.GameFlow
         {
             DebugLog($"★★★ Player {winnerIndex} WINS by claiming {claimedTile.Data}! ★★★", debugController.ClaimWin);
             
+            // Add claimed tile to hand temporarily for scoring
+            playerHands[winnerIndex].AddTile(claimedTile);
+            
             bool dealerWon = stateManager.State.IsDealer(winnerIndex);
             stateManager.CompleteHand(winnerIndex, dealerWon);
 
-            // TODO: Show win UI with scoring
+            // Calculate score and show win screen
+            ShowWinScreen(winnerIndex, playerHands[winnerIndex], isSelfDrawn: false);
+        }
+
+        #endregion
+
+        #region Win Handling
+
+        private void ShowWinScreen(int winnerIndex, Hand hand, bool isSelfDrawn)
+        {
+            if (winScreenUI == null)
+            {
+                DebugLog("No win screen UI - skipping display", true);
+                return;
+            }
+
+            // Build scoring context
+            TileInstance winningTile = null;
+            var concealedTiles = hand.GetConcealedTiles();
+            if (concealedTiles.Count > 0)
+            {
+                // Last tile in hand is the winning tile
+                winningTile = concealedTiles[concealedTiles.Count - 1];
+            }
+
+            // Get player's wind
+            WindType seatWind = stateManager.State.GetSeatWind(winnerIndex);
+            WindType prevailingWind = stateManager.State.PrevailingWind;
+
+            // Get bonus tiles
+            var bonusTiles = hand.GetBonusTiles();
+
+            // Build scoring context
+            ScoringContext context = new ScoringContext
+            {
+                IsSelfDrawn = isSelfDrawn,
+                WinningTile = winningTile?.Data ?? default,
+                SeatWind = seatWind,
+                PrevailingWind = prevailingWind,
+                IsDealer = stateManager.State.IsDealer(winnerIndex),
+                BonusTileCount = bonusTiles.Count,
+                IsLastTileFromWall = false,
+                IsReplacementTile = false,
+                IsRobbingKong = false
+            };
+
+            // Calculate score
+            ScoreResult scoreResult = scoringSystem.CalculateScore(hand, context);
+
+            DebugLog($"Score calculated: {scoreResult.Points} points" + 
+                     (scoreResult.Fan.HasValue ? $", {scoreResult.Fan.Value} fan" : ""), true);
+
+            // Show win screen
+            winScreenUI.ShowWinScreen(winnerIndex, hand, scoreResult, isSelfDrawn);
+        }
+
+        private void StartNextHand()
+        {
+            DebugLog("Starting next hand...", true);
+            
+            // Hide win screen
+            if (winScreenUI != null)
+            {
+                winScreenUI.HideWinScreen();
+            }
+
+            // Clear discard pile display
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.ClearDiscardPile();
+            }
+
+            // Start new hand
+            stateManager.StartNewHand();
+        }
+
+        private void QuitGame()
+        {
+            DebugLog("Quitting game...", true);
+            
+            // Hide win screen
+            if (winScreenUI != null)
+            {
+                winScreenUI.HideWinScreen();
+            }
+
+            // TODO: Return to main menu or quit application
+            #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+            #else
+            Application.Quit();
+            #endif
         }
 
         #endregion

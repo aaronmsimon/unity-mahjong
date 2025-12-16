@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 using MJ.Core.Tiles;
@@ -23,7 +22,6 @@ namespace MJ.UI
         [SerializeField] private Transform discardPileContainer;
         [SerializeField] private GameObject tilePrefab;
         [SerializeField] private TileSpriteLibrarySO spriteLibrary;
-        [SerializeField] private float discardTileSpacing = 60f;
         [SerializeField] private int discardTilesPerRow = 6;
 
         [Header("Turn Indicator")]
