@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using RoboRyanTron.Unite2017.Events;
 
 namespace MJ.Testing
 {
@@ -20,8 +21,8 @@ namespace MJ.Testing
         [SerializeField] private bool startOpen = false;
 
         [Header("Section: Game Control")]
-        [SerializeField] private Button startNewGameButton;
-        [SerializeField] private Button startNewRoundButton;
+        [SerializeField] private GameEvent startNewGameEvent;
+        [SerializeField] private GameEvent startNewRoundEvent;
 
         [Header("Section: Player Control")]
         [SerializeField] private Button switchSeat0Button;
@@ -38,13 +39,6 @@ namespace MJ.Testing
         private Vector2 openPosition;
         private Vector2 closedPosition;
         private bool isAnimating;
-
-        // Events for button clicks (GameFlowController will subscribe)
-        public System.Action OnStartNewGame;
-        public System.Action OnStartNewHand;
-        public System.Action<int> OnSwitchToSeat;
-        public System.Action OnSwitchToActivePlayer;
-        public System.Action OnExchangeTile;
 
         private void Awake()
         {
@@ -80,44 +74,6 @@ namespace MJ.Testing
             if (toggleButton != null)
             {
                 toggleButton.onClick.AddListener(TogglePanel);
-            }
-
-            // Game Control
-            if (startNewGameButton != null)
-            {
-                startNewGameButton.onClick.AddListener(() => OnStartNewGame?.Invoke());
-            }
-            if (startNewRoundButton != null)
-            {
-                startNewRoundButton.onClick.AddListener(() => OnStartNewHand?.Invoke());
-            }
-
-            // Player Control
-            if (switchSeat0Button != null)
-            {
-                switchSeat0Button.onClick.AddListener(() => OnSwitchToSeat?.Invoke(0));
-            }
-            if (switchSeat1Button != null)
-            {
-                switchSeat1Button.onClick.AddListener(() => OnSwitchToSeat?.Invoke(1));
-            }
-            if (switchSeat2Button != null)
-            {
-                switchSeat2Button.onClick.AddListener(() => OnSwitchToSeat?.Invoke(2));
-            }
-            if (switchSeat3Button != null)
-            {
-                switchSeat3Button.onClick.AddListener(() => OnSwitchToSeat?.Invoke(3));
-            }
-            if (switchToActivePlayerButton != null)
-            {
-                switchToActivePlayerButton.onClick.AddListener(() => OnSwitchToActivePlayer?.Invoke());
-            }
-
-            // Hand Editor
-            if (exchangeTileButton != null)
-            {
-                exchangeTileButton.onClick.AddListener(() => OnExchangeTile?.Invoke());
             }
         }
 
@@ -207,6 +163,14 @@ namespace MJ.Testing
         {
             UnityEngine.Debug.Log($"[Debug Console] {message}");
             // TODO: Add text display in UI
+        }
+
+        public void StartNewGame() {
+            startNewGameEvent.Raise();
+        }
+
+        public void StartNewRound() {
+            startNewRoundEvent.Raise();
         }
 
         #endregion
