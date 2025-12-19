@@ -433,11 +433,8 @@ MonoBehaviour:
   startOpen: 0
   startNewGameEvent: {fileID: 11400000, guid: 9f91410fede7abe478a0f36dd0fc2a14, type: 2}
   startNewRoundEvent: {fileID: 11400000, guid: 6fc5f290740dd074483c33652023fd2c, type: 2}
-  switchSeat0Button: {fileID: 376240320}
-  switchSeat1Button: {fileID: 1049335723}
-  switchSeat2Button: {fileID: 1008134759}
-  switchSeat3Button: {fileID: 1043792072}
-  switchToActivePlayerButton: {fileID: 979098333}
+  switchToSeat: {fileID: 11400000, guid: 45a93cb43f74cad46a83211b16e99485, type: 2}
+  activeSeat: {fileID: 11400000, guid: f64a71c3200577148bc94f5cc742e7b8, type: 2}
   exchangeTileButton: {fileID: 1406146854}
 --- !u!1 &153098465
 GameObject:
@@ -1254,7 +1251,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 376240321}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 44772802}
+        m_TargetAssemblyTypeName: MJ.Testing.DebugConsoleUI, Assembly-CSharp
+        m_MethodName: SetActiveSeat
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &376240321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2672,7 +2681,6 @@ MonoBehaviour:
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 353927676}
   bonusTileContainer: {fileID: 651679173}
-  isInteractive: 0
   isFaceUp: 0
   selectedOffset: 20
 --- !u!1 &548842685
@@ -4959,7 +4967,6 @@ MonoBehaviour:
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 1376972762}
   bonusTileContainer: {fileID: 1195874748}
-  isInteractive: 1
   isFaceUp: 0
   selectedOffset: 20
 --- !u!1 &951877960
@@ -5222,7 +5229,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 979098334}
   m_OnClick:
     m_PersistentCalls:
@@ -5483,7 +5490,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1008134760}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 44772802}
+        m_TargetAssemblyTypeName: MJ.Testing.DebugConsoleUI, Assembly-CSharp
+        m_MethodName: SetActiveSeat
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1008134760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5639,7 +5658,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1043792073}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 44772802}
+        m_TargetAssemblyTypeName: MJ.Testing.DebugConsoleUI, Assembly-CSharp
+        m_MethodName: SetActiveSeat
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1043792073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5760,7 +5791,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1049335724}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 44772802}
+        m_TargetAssemblyTypeName: MJ.Testing.DebugConsoleUI, Assembly-CSharp
+        m_MethodName: SetActiveSeat
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1049335724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7514,7 +7557,6 @@ MonoBehaviour:
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 2000336285}
   bonusTileContainer: {fileID: 443717582}
-  isInteractive: 1
   isFaceUp: 1
   selectedOffset: 20
 --- !u!1 &1598714066
@@ -7938,7 +7980,6 @@ MonoBehaviour:
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 1498886008}
   bonusTileContainer: {fileID: 1029824777}
-  isInteractive: 1
   isFaceUp: 0
   selectedOffset: 20
 --- !u!1 &1739204077
@@ -8563,6 +8604,7 @@ GameObject:
   - component: {fileID: 2030213243}
   - component: {fileID: 2030213246}
   - component: {fileID: 2030213247}
+  - component: {fileID: 2030213248}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -8590,6 +8632,7 @@ MonoBehaviour:
   winScreenUI: {fileID: 1739204079}
   useRandomSeed: 0
   shuffleSeed: 12345
+  activeSeat: {fileID: 11400000, guid: f64a71c3200577148bc94f5cc742e7b8, type: 2}
   debugController: {fileID: 11400000, guid: f938fdf21e45c4e4cb1a7e9bbb1611c9, type: 2}
 --- !u!114 &2030213244
 MonoBehaviour:
@@ -8676,6 +8719,34 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &2030213248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2030213242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09215ce64509bdc448d8746fd2ad9ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboRyanTron.Unite2017.Events.GameEventListener
+  Event: {fileID: 11400000, guid: 45a93cb43f74cad46a83211b16e99485, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2030213243}
+        m_TargetAssemblyTypeName: MJ.GameFlow.GameFlowController, Assembly-CSharp
+        m_MethodName: SwitchToSeat
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

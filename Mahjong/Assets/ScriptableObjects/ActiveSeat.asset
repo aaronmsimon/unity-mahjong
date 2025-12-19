@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ActiveSeat
   m_EditorClassIdentifier: Assembly-CSharp::RoboRyanTron.Unite2017.Variables.FloatVariable
   DeveloperDescription: 
-  Value: 0
+  Value: 3
