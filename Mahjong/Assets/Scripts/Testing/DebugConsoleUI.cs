@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using RoboRyanTron.Unite2017.Events;
+using RoboRyanTron.Unite2017.Variables;
 
 namespace MJ.Testing
 {
@@ -23,13 +24,8 @@ namespace MJ.Testing
         [Header("Section: Game Control")]
         [SerializeField] private GameEvent startNewGameEvent;
         [SerializeField] private GameEvent startNewRoundEvent;
-
-        [Header("Section: Player Control")]
-        [SerializeField] private Button switchSeat0Button;
-        [SerializeField] private Button switchSeat1Button;
-        [SerializeField] private Button switchSeat2Button;
-        [SerializeField] private Button switchSeat3Button;
-        [SerializeField] private Button switchToActivePlayerButton;
+        [SerializeField] private GameEvent switchToSeat;
+        [SerializeField] private FloatVariable activeSeat;
 
         [Header("Section: Hand Editor")]
         [SerializeField] private Button exchangeTileButton;
@@ -57,7 +53,7 @@ namespace MJ.Testing
         {
             if (debugPanel == null)
             {
-                UnityEngine.Debug.LogError("Debug Panel not assigned!");
+                Debug.LogError("Debug Panel not assigned!");
                 return;
             }
 
@@ -161,7 +157,7 @@ namespace MJ.Testing
         /// </summary>
         public void ShowMessage(string message)
         {
-            UnityEngine.Debug.Log($"[Debug Console] {message}");
+            Debug.Log($"[Debug Console] {message}");
             // TODO: Add text display in UI
         }
 
@@ -171,6 +167,11 @@ namespace MJ.Testing
 
         public void StartNewRound() {
             startNewRoundEvent.Raise();
+        }
+        
+        public void SetActiveSeat(int activeSeat) {
+            this.activeSeat.Value = activeSeat;
+            switchToSeat.Raise();
         }
 
         #endregion

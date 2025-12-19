@@ -10,6 +10,7 @@ using MJ.Evaluation;
 using MJ.UI;
 using MJ.Testing;
 using MJ.Scoring;
+using RoboRyanTron.Unite2017.Variables;
 
 namespace MJ.GameFlow
 {
@@ -32,6 +33,7 @@ namespace MJ.GameFlow
         [Header("Configuration")]
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int shuffleSeed = 12345; // Used when useRandomSeed is false
+        [SerializeField] private FloatVariable activeSeat; // Which seat is currently being controlled
 
         [Header("Debug")]
         [SerializeField] private DebugControllerSO debugController;
@@ -51,9 +53,6 @@ namespace MJ.GameFlow
         
         // Random number generator for AI (seeded for reproducibility)
         private System.Random aiRandom;
-
-        // Which seat is currently being controlled
-        private int activeSeat = 0; 
 
         private void Awake()
         {
@@ -131,6 +130,7 @@ namespace MJ.GameFlow
         [ContextMenu("Start New Game")]
         public void StartGame()
         {
+            activeSeat.Value = 0;
             stateManager.StartNewGame();
         }
 
@@ -244,7 +244,7 @@ namespace MJ.GameFlow
         private void OnActiveSeatChanged(int newSeatIndex)
         {
             // Unsubscribe from old seat's discard event
-            HandView oldView = tableLayoutView.GetPlayerHandView(activeSeat);
+            HandView oldView = tableLayoutView.GetPlayerHandView((int)activeSeat.Value);
             if (oldView != null)
             {
                 oldView.OnTileDiscarded -= OnPlayerDiscardedTile;
@@ -257,13 +257,13 @@ namespace MJ.GameFlow
                 newView.OnTileDiscarded += OnPlayerDiscardedTile;
             }
             
-            activeSeat = newSeatIndex;
+            activeSeat.Value = newSeatIndex;
             
             // Update waitingForPlayerDiscard based on whether active seat matches current turn
             int currentTurn = stateManager.GetCurrentTurn();
-            waitingForPlayerDiscard = (currentTurn == activeSeat);
+            waitingForPlayerDiscard = (currentTurn == activeSeat.Value);
             
-            DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", true);
+            DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", debugController.ChangeSeat);
         }
 
         #endregion
@@ -383,7 +383,7 @@ namespace MJ.GameFlow
             ShowPlayerHand(currentPlayer);
             
             // Handle discard based on whether it's the active seat's turn
-            if (currentPlayer == activeSeat)
+            if (currentPlayer == activeSeat.Value)
             {
                 // Human player - wait for them to click discard
                 DebugLog($"Player {currentPlayer}: Select a tile and click Discard", debugController.HandleDiscard);
@@ -490,7 +490,7 @@ namespace MJ.GameFlow
             }
 
             int currentPlayer = stateManager.GetCurrentTurn();
-            if (currentPlayer != activeSeat)
+            if (currentPlayer != activeSeat.Value)
             {
                 DebugLog($"Not active seat's turn (active={activeSeat}, current={currentPlayer})", debugController.DiscardTile);
                 return;
@@ -524,7 +524,7 @@ namespace MJ.GameFlow
             DebugLog($"Claim window opened for {discardedTile.Data} from Player {discardPlayerIndex}", debugController.ClaimWindowOpened);
 
             // Check what the ACTIVE SEAT can claim
-            ClaimOptions options = claimManager.GetValidClaims(activeSeat, discardedTile.Data, playerHands[activeSeat]);
+            ClaimOptions options = claimManager.GetValidClaims((int)activeSeat.Value, discardedTile.Data, playerHands[(int)activeSeat.Value]);
 
             DebugLog($"Claim options for Seat {activeSeat}: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}", debugController.ClaimOptions);
 
@@ -543,7 +543,7 @@ namespace MJ.GameFlow
             {
                 // Can't claim anything - auto-pass
                 DebugLog($"Seat {activeSeat} cannot claim - auto-passing", debugController.ClaimDecision);
-                claimManager.SubmitPass(activeSeat);
+                claimManager.SubmitPass((int)activeSeat.Value);
             }
             else
             {
@@ -561,13 +561,13 @@ namespace MJ.GameFlow
         private void OnPlayerClaim(ClaimType claimType)
         {
             DebugLog($"Seat {activeSeat} claiming {claimType}", debugController.ClaimDecision);
-            claimManager.SubmitClaim(activeSeat, claimType);
+            claimManager.SubmitClaim((int)activeSeat.Value, claimType);
         }
 
         private void OnPlayerPass()
         {
             DebugLog($"Seat {activeSeat} passed", debugController.ClaimDecision);
-            claimManager.SubmitPass(activeSeat);
+            claimManager.SubmitPass((int)activeSeat.Value);
         }
 
         private void OnClaimResolved(int winnerIndex, ClaimType claimType, TileInstance claimedTile)
@@ -897,6 +897,15 @@ namespace MJ.GameFlow
             if (enabled)
             {
                 Debug.Log($"[GameFlow] {message}");
+            }
+        }
+
+        public void SwitchToSeat()
+        {
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.SwitchToSeat((int)activeSeat.Value);
+                tableLayoutView.UpdateAllPlayerHands();
             }
         }
 

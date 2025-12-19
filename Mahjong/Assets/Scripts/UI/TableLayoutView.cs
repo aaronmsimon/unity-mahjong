@@ -88,6 +88,17 @@ namespace MJ.UI
             return null;
         }
 
+        /// <summary>
+        /// Refresh all hand displays
+        /// </summary>
+        public void UpdateAllPlayerHands()
+        {
+            bottomPlayerHand.RefreshDisplay();
+            rightPlayerHand.RefreshDisplay();
+            topPlayerHand.RefreshDisplay();
+            leftPlayerHand.RefreshDisplay();
+        }
+
         #endregion
 
         #region Discard Pile

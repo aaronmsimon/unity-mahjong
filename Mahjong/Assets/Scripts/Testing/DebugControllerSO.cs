@@ -30,6 +30,7 @@ namespace MJ.Testing
         public bool StartHand;
         public bool Shuffle;
         public bool ChangeTurn;
+        public bool ChangeSeat;
         public bool DealHands;
         public bool BonusTileReplacement;
         public bool ShowHand;
