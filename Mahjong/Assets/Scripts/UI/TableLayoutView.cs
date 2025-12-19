@@ -37,6 +37,9 @@ namespace MJ.UI
         [SerializeField] private TMP_Text leftPlayerLabel;
 
         private List<TileView> discardPileTileViews = new List<TileView>();
+        private int currentActiveSeat = 0;
+
+        public System.Action<int> OnActiveSeatChanged;
 
         private void Awake()
         {
@@ -190,6 +193,53 @@ namespace MJ.UI
 
         #endregion
 
+        #region Seat Controls
+
+        /// <summary>
+        /// Switch active seat and revise view
+        /// </summary>
+        public void SwitchToSeat(int newSeatIndex)
+        {
+            if (newSeatIndex < 0 || newSeatIndex > 3) return;
+            if (newSeatIndex == currentActiveSeat) return; // Already at this seat
+            
+            // Deactivate old seat
+            HandView oldSeatView = GetHandViewForSeat(currentActiveSeat);
+            if (oldSeatView != null)
+            {
+                oldSeatView.SetFaceUp(false);
+            }
+            
+            // Activate new seat
+            HandView newSeatView = GetHandViewForSeat(newSeatIndex);
+            if (newSeatView != null)
+            {
+                newSeatView.SetFaceUp(true);
+            }
+            
+            currentActiveSeat = newSeatIndex;
+            
+            // Fire event for GameFlowController to update game logic
+            OnActiveSeatChanged?.Invoke(newSeatIndex);
+        }
+
+        /// <summary>
+        /// Getter for which seat view
+        /// </summary>        
+        private HandView GetHandViewForSeat(int seatIndex)
+        {
+            return seatIndex switch
+            {
+                0 => bottomPlayerHand,
+                1 => rightPlayerHand,
+                2 => topPlayerHand,
+                3 => leftPlayerHand,
+                _ => null
+            };
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private void SetPlayerLabel(TMP_Text label, string text, int playerIndex)
@@ -231,6 +281,11 @@ namespace MJ.UI
                 3 => leftPlayerLabel,
                 _ => null
             };
+        }
+
+        public int GetActiveSeat()
+        {
+            return currentActiveSeat;
         }
 
         #endregion
