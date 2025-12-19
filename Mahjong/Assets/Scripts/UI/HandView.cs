@@ -20,11 +20,15 @@ namespace MJ.UI
         [SerializeField] private Transform tileContainer;
         [SerializeField] private Transform bonusTileContainer;
 
+        [Header("Settings")]
+        [SerializeField] private bool isFaceUp = true;
+
         [Header("Layout")]
         [SerializeField] private float selectedOffset = 20f; // How much selected tile moves up
 
         // Current hand being displayed
         private Hand currentHand;
+        private int seatIndex = 0;
         
         // Visual tiles
         private List<TileView> concealedTileViews = new List<TileView>();
@@ -131,7 +135,7 @@ namespace MJ.UI
             TileView tileView = tileObj.GetComponent<TileView>();
             if (tileView != null)
             {
-                tileView.Setup(tile, sprite, faceUp: true);
+                tileView.Setup(tile, sprite, isFaceUp);
             }
 
             return tileView;
@@ -155,6 +159,7 @@ namespace MJ.UI
 
         private void OnTileClicked(TileView clickedTile)
         {
+            Debug.Log(clickedTile.GetTileInstance().Data);
             // Toggle selection
             if (selectedTile == clickedTile)
             {
@@ -281,6 +286,27 @@ namespace MJ.UI
         public bool HasSelectedTile()
         {
             return selectedTile != null;
+        }
+
+        /// <summary>
+        /// Set if the hand view's tiles are face up or not
+        /// </summary>
+        public void SetFaceUp(bool faceUp) {
+            isFaceUp = faceUp;
+        }
+
+        /// <summary>
+        /// Assign the seat index of this hand view
+        /// </summary>
+        public void SetSeatIndex(int index) {
+            seatIndex = index;
+        }
+
+        /// <summary>
+        /// Getter for seat index
+        /// </summary>
+        public int GetSeatIndex() {
+            return seatIndex;
         }
 
         #endregion

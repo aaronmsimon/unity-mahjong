@@ -2626,7 +2626,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 543875131}
-  - component: {fileID: 543875132}
+  - component: {fileID: 543875133}
   m_Layer: 5
   m_Name: RightPlayer
   m_TagString: Untagged
@@ -2647,6 +2647,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 353927676}
+  - {fileID: 651679173}
   - {fileID: 1145795426}
   m_Father: {fileID: 1598714067}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
@@ -2655,7 +2656,7 @@ RectTransform:
   m_AnchoredPosition: {x: -50, y: 0}
   m_SizeDelta: {x: 850, y: 100}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &543875132
+--- !u!114 &543875133
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2664,14 +2665,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 543875130}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89890f31193b59549a5267edc0dbbaeb, type: 3}
+  m_Script: {fileID: 11500000, guid: ad67b78d0f2cc344e88a804a1156d7a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.OpponentHandView
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.HandView
   spriteLibrary: {fileID: 11400000, guid: 4f4f2992ce10c0949af329f4fa5faaba, type: 2}
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 353927676}
-  tileSpacing: 70
-  verticalLayout: 0
+  bonusTileContainer: {fileID: 651679173}
+  isInteractive: 0
+  isFaceUp: 0
+  selectedOffset: 20
 --- !u!1 &548842685
 GameObject:
   m_ObjectHideFlags: 0
@@ -3833,6 +3836,41 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &651679172
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 651679173}
+  m_Layer: 5
+  m_Name: BonusTileContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &651679173
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 651679172}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543875131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 850, y: 100}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &676490716
 GameObject:
   m_ObjectHideFlags: 0
@@ -4896,6 +4934,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1376972762}
+  - {fileID: 1195874748}
   - {fileID: 937680841}
   m_Father: {fileID: 1598714067}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4913,14 +4952,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 948870432}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89890f31193b59549a5267edc0dbbaeb, type: 3}
+  m_Script: {fileID: 11500000, guid: ad67b78d0f2cc344e88a804a1156d7a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.OpponentHandView
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.HandView
   spriteLibrary: {fileID: 11400000, guid: 4f4f2992ce10c0949af329f4fa5faaba, type: 2}
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 1376972762}
-  tileSpacing: 70
-  verticalLayout: 0
+  bonusTileContainer: {fileID: 1195874748}
+  isInteractive: 1
+  isFaceUp: 0
+  selectedOffset: 20
 --- !u!1 &951877960
 GameObject:
   m_ObjectHideFlags: 0
@@ -5481,6 +5522,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008134757}
   m_CullTransparentMesh: 1
+--- !u!1 &1029824776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1029824777}
+  m_Layer: 5
+  m_Name: BonusTileContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1029824777
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029824776}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1731602148}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 850, y: 100}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &1043792070
 GameObject:
   m_ObjectHideFlags: 0
@@ -6105,6 +6181,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145795425}
   m_CullTransparentMesh: 1
+--- !u!1 &1195874747
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1195874748}
+  m_Layer: 5
+  m_Name: BonusTileContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1195874748
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195874747}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 948870433}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 850, y: 100}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &1214071748
 GameObject:
   m_ObjectHideFlags: 0
@@ -7403,6 +7514,8 @@ MonoBehaviour:
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 2000336285}
   bonusTileContainer: {fileID: 443717582}
+  isInteractive: 1
+  isFaceUp: 1
   selectedOffset: 20
 --- !u!1 &1598714066
 GameObject:
@@ -7459,7 +7572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.TableLayoutView
   bottomPlayerHand: {fileID: 1596676647}
-  rightPlayerHand: {fileID: 543875132}
+  rightPlayerHand: {fileID: 543875133}
   topPlayerHand: {fileID: 948870434}
   leftPlayerHand: {fileID: 1731602149}
   discardPileContainer: {fileID: 1250343727}
@@ -7800,6 +7913,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1498886008}
+  - {fileID: 1029824777}
   - {fileID: 616976692}
   m_Father: {fileID: 1598714067}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
@@ -7817,14 +7931,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1731602147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89890f31193b59549a5267edc0dbbaeb, type: 3}
+  m_Script: {fileID: 11500000, guid: ad67b78d0f2cc344e88a804a1156d7a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.OpponentHandView
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.UI.HandView
   spriteLibrary: {fileID: 11400000, guid: 4f4f2992ce10c0949af329f4fa5faaba, type: 2}
   tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
   tileContainer: {fileID: 1498886008}
-  tileSpacing: 70
-  verticalLayout: 0
+  bonusTileContainer: {fileID: 1029824777}
+  isInteractive: 1
+  isFaceUp: 0
+  selectedOffset: 20
 --- !u!1 &1739204077
 GameObject:
   m_ObjectHideFlags: 0

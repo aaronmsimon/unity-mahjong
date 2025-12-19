@@ -14,9 +14,9 @@ namespace MJ.UI
     {
         [Header("Player Hand Views")]
         [SerializeField] private HandView bottomPlayerHand;  // Player 0 (Human)
-        [SerializeField] private OpponentHandView rightPlayerHand;   // Player 1
-        [SerializeField] private OpponentHandView topPlayerHand;     // Player 2
-        [SerializeField] private OpponentHandView leftPlayerHand;    // Player 3
+        [SerializeField] private HandView rightPlayerHand;   // Player 1
+        [SerializeField] private HandView topPlayerHand;     // Player 2
+        [SerializeField] private HandView leftPlayerHand;    // Player 3
 
         [Header("Discard Pile")]
         [SerializeField] private Transform discardPileContainer;
