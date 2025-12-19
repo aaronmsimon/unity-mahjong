@@ -52,6 +52,9 @@ namespace MJ.GameFlow
         // Random number generator for AI (seeded for reproducibility)
         private System.Random aiRandom;
 
+        // Which seat is currently being controlled
+        private int activeSeat = 0; 
+
         private void Awake()
         {
             // Initialize rule set
@@ -80,16 +83,6 @@ namespace MJ.GameFlow
                 gameEvents.OnTurnChanged.AddListener(OnTurnChanged);
             }
 
-            // Setup table layout view
-            if (tableLayoutView != null)
-            {
-                HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
-                if (humanHandView != null)
-                {
-                    humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
-                }
-            }
-
             // Setup claim manager
             if (claimManager != null)
             {
@@ -114,6 +107,19 @@ namespace MJ.GameFlow
             {
                 winScreenUI.OnNextHandClicked += StartNextHand;
                 winScreenUI.OnQuitClicked += QuitGame;
+            }
+
+            // Setup table layout view
+            if (tableLayoutView != null)
+            {
+                HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
+                if (humanHandView != null)
+                {
+                    humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
+                }
+                
+                // Subscribe to seat changes
+                tableLayoutView.OnActiveSeatChanged += OnActiveSeatChanged;
             }
         }
 
@@ -235,6 +241,31 @@ namespace MJ.GameFlow
             DebugLog($"Turn changed to Player {newPlayerIndex}", debugController.ChangeTurn);
         }
 
+        private void OnActiveSeatChanged(int newSeatIndex)
+        {
+            // Unsubscribe from old seat's discard event
+            HandView oldView = tableLayoutView.GetPlayerHandView(activeSeat);
+            if (oldView != null)
+            {
+                oldView.OnTileDiscarded -= OnPlayerDiscardedTile;
+            }
+            
+            // Subscribe to new seat's discard event
+            HandView newView = tableLayoutView.GetPlayerHandView(newSeatIndex);
+            if (newView != null)
+            {
+                newView.OnTileDiscarded += OnPlayerDiscardedTile;
+            }
+            
+            activeSeat = newSeatIndex;
+            
+            // Update waitingForPlayerDiscard based on whether active seat matches current turn
+            int currentTurn = stateManager.GetCurrentTurn();
+            waitingForPlayerDiscard = (currentTurn == activeSeat);
+            
+            DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", true);
+        }
+
         #endregion
 
         #region Game Flow
@@ -351,8 +382,8 @@ namespace MJ.GameFlow
             // Show hand
             ShowPlayerHand(currentPlayer);
             
-            // Handle discard based on player type
-            if (currentPlayer == 0)
+            // Handle discard based on whether it's the active seat's turn
+            if (currentPlayer == activeSeat)
             {
                 // Human player - wait for them to click discard
                 DebugLog($"Player {currentPlayer}: Select a tile and click Discard", debugController.HandleDiscard);
@@ -459,9 +490,9 @@ namespace MJ.GameFlow
             }
 
             int currentPlayer = stateManager.GetCurrentTurn();
-            if (currentPlayer != 0)
+            if (currentPlayer != activeSeat)
             {
-                DebugLog("Not player 0's turn", debugController.DiscardTile);
+                DebugLog($"Not active seat's turn (active={activeSeat}, current={currentPlayer})", debugController.DiscardTile);
                 return;
             }
 
@@ -492,10 +523,10 @@ namespace MJ.GameFlow
         {
             DebugLog($"Claim window opened for {discardedTile.Data} from Player {discardPlayerIndex}", debugController.ClaimWindowOpened);
 
-            // Check what player 0 (human) can claim
-            ClaimOptions options = claimManager.GetValidClaims(0, discardedTile.Data, playerHands[0]);
+            // Check what the ACTIVE SEAT can claim
+            ClaimOptions options = claimManager.GetValidClaims(activeSeat, discardedTile.Data, playerHands[activeSeat]);
 
-            DebugLog($"Claim options: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}", debugController.ClaimOptions);
+            DebugLog($"Claim options for Seat {activeSeat}: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}", debugController.ClaimOptions);
 
             // Show claim UI for human player
             if (claimButtonsUI != null && options.HasAnyClaim)
@@ -511,8 +542,8 @@ namespace MJ.GameFlow
             else if (claimButtonsUI != null)
             {
                 // Can't claim anything - auto-pass
-                DebugLog("Player 0 cannot claim - auto-passing", debugController.ClaimDecision);
-                claimManager.SubmitPass(0);
+                DebugLog($"Seat {activeSeat} cannot claim - auto-passing", debugController.ClaimDecision);
+                claimManager.SubmitPass(activeSeat);
             }
             else
             {
@@ -529,14 +560,14 @@ namespace MJ.GameFlow
 
         private void OnPlayerClaim(ClaimType claimType)
         {
-            DebugLog($"Player 0 claiming {claimType}", debugController.ClaimDecision);
-            claimManager.SubmitClaim(0, claimType);
+            DebugLog($"Seat {activeSeat} claiming {claimType}", debugController.ClaimDecision);
+            claimManager.SubmitClaim(activeSeat, claimType);
         }
 
         private void OnPlayerPass()
         {
-            DebugLog("Player 0 passed", debugController.ClaimDecision);
-            claimManager.SubmitPass(0);
+            DebugLog($"Seat {activeSeat} passed", debugController.ClaimDecision);
+            claimManager.SubmitPass(activeSeat);
         }
 
         private void OnClaimResolved(int winnerIndex, ClaimType claimType, TileInstance claimedTile)
