@@ -98,16 +98,6 @@ namespace MJ.GameFlow
                 winScreenUI.OnNextHandClicked += StartNextHand;
                 winScreenUI.OnQuitClicked += QuitGame;
             }
-
-            // Setup table layout view
-            if (tableLayoutView != null)
-            {
-                HandView humanHandView = tableLayoutView.GetPlayerHandView(0);
-                if (humanHandView != null)
-                {
-                    humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
-                }
-            }
         }
 
         #region Public API
@@ -123,13 +113,24 @@ namespace MJ.GameFlow
 
             DebugLog("=== GAME STARTED ===", debugController.StartGame);
             
+            // Initialize view to show Seat 0 at bottom
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.SwitchToSeat(0);
+            }
+
             // Start first hand
             StartNextHand();
-
-            // if (tableLayoutView != null)
-            // {
-            //     tableLayoutView.SetCurrentTurn(0);
-            // }
+    
+            // Subscribe to active seat's discard event
+            if (tableLayoutView != null)
+            {
+                HandView activeView = tableLayoutView.GetPlayerHandView((int)activeSeat.Value);
+                if (activeView != null)
+                {
+                    activeView.OnTileDiscarded += OnPlayerDiscardedTile;
+                }
+            }
         }
 
         /// <summary>
@@ -202,12 +203,6 @@ namespace MJ.GameFlow
 
             // Update state
             stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
-            
-            // Update player labels with wind positions
-            if (tableLayoutView != null)
-            {
-                tableLayoutView.UpdatePlayerLabels(stateManager.State.DealerIndex);
-            }
         }
 
         /// <summary>
@@ -787,6 +782,12 @@ namespace MJ.GameFlow
             // Deal tiles to players
             DealInitialHands();
 
+            // Update labels with dealer/wind info
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.UpdateAllPlayerLabels(stateManager.State.DealerIndex);
+            }
+
             // Update validator with current state
             actionValidator.UpdateGameState(stateManager.State);
 
@@ -855,20 +856,35 @@ namespace MJ.GameFlow
         {
             int newSeatIndex = (int)activeSeat.Value;
 
+            DebugLog($"[GameFlow] Switching to control Seat {newSeatIndex}", debugController.ChangeSeat);
+
             if (tableLayoutView != null)
             {
+                // Tell TableLayoutView to rotate the view
                 tableLayoutView.SwitchToSeat(newSeatIndex);
-                tableLayoutView.UpdateAllPlayerHands();
+                
+                // Update all labels to show correct seat numbers/winds
+                tableLayoutView.UpdateAllPlayerLabels(stateManager.State.DealerIndex);
+                
+                // Refresh all hands - they'll now display at rotated positions
+                for (int i = 0; i < playerHands.Count; i++)
+                {
+                    tableLayoutView.UpdatePlayerHand(i, playerHands[i]);
+                }
             }
 
-            // Unsubscribe from old seat's discard event
-            HandView oldView = tableLayoutView.GetPlayerHandView(newSeatIndex);
-            if (oldView != null)
+            // Update event subscription
+            // Unsubscribe from ALL seats first (to be safe)
+            for (int i = 0; i < 4; i++)
             {
-                oldView.OnTileDiscarded -= OnPlayerDiscardedTile;
+                HandView view = tableLayoutView.GetPlayerHandView(i);
+                if (view != null)
+                {
+                    view.OnTileDiscarded -= OnPlayerDiscardedTile;
+                }
             }
             
-            // Subscribe to new seat's discard event
+            // Subscribe to new active seat
             HandView newView = tableLayoutView.GetPlayerHandView(newSeatIndex);
             if (newView != null)
             {
@@ -877,6 +893,7 @@ namespace MJ.GameFlow
             
             // Update waitingForPlayerDiscard based on whether active seat matches current turn
             int currentTurn = stateManager.GetCurrentTurn();
+            waitingForPlayerDiscard = currentTurn == newSeatIndex;
             
             DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", debugController.ChangeSeat);
         }

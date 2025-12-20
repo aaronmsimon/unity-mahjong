@@ -8,15 +8,22 @@ namespace MJ.UI
 {
     /// <summary>
     /// Manages the overall table layout showing all 4 players and discard pile
-    /// Positions: Bottom (Player 0 - Human), Right (Player 1), Top (Player 2), Left (Player 3)
+    /// 
+    /// **VIEW ROTATION SYSTEM:**
+    /// - Active seat (controlled player) always appears at BOTTOM
+    /// - Other seats rotate around the table: Right (next), Top (opposite), Left (previous)
+    /// - When switching seats (debug or multiplayer), view rotates to keep active player at bottom
+    /// 
+    /// Physical positions: Bottom (active player), Right (next), Top (opposite), Left (previous)
+    /// Logical seats: 0-3 (game seats, never change)
     /// </summary>
     public class TableLayoutView : MonoBehaviour
     {
-        [Header("Player Hand Views")]
-        [SerializeField] private HandView bottomPlayerHand;  // Player 0 (Human)
-        [SerializeField] private HandView rightPlayerHand;   // Player 1
-        [SerializeField] private HandView topPlayerHand;     // Player 2
-        [SerializeField] private HandView leftPlayerHand;    // Player 3
+        [Header("Player Hand Views - Physical Positions")]
+        [SerializeField] private HandView bottomPlayerHand;  // Active player (rotates)
+        [SerializeField] private HandView rightPlayerHand;   // Next player clockwise
+        [SerializeField] private HandView topPlayerHand;     // Opposite player
+        [SerializeField] private HandView leftPlayerHand;    // Previous player
 
         [Header("Discard Pile")]
         [SerializeField] private Transform discardPileContainer;
@@ -37,51 +44,92 @@ namespace MJ.UI
         [SerializeField] private TMP_Text leftPlayerLabel;
 
         private List<TileView> discardPileTileViews = new List<TileView>();
-        private int currentActiveSeat = 0;
+        
+        // This determines how the view rotates - active seat always shows at bottom
+        private int activeSeatIndex = 0;
+        
+        // We need to know which Hand object is at each visual position
+        // so we can refresh displays when view rotates
+        private Hand[] handsAtPositions = new Hand[4]; // [bottom, right, top, left]
 
         private void Awake()
         {
-            // Setup player labels
-            SetPlayerLabel(bottomPlayerLabel, "You (East)", 0);
-            SetPlayerLabel(rightPlayerLabel, "Player 1 (South)", 1);
-            SetPlayerLabel(topPlayerLabel, "Player 2 (West)", 2);
-            SetPlayerLabel(leftPlayerLabel, "Player 3 (North)", 3);
+            // Setup initial player labels (will update when seat switches)
+            UpdateAllPlayerLabels(0); // Assume dealer starts at seat 0
         }
 
         #region Hand Display
 
         /// <summary>
-        /// Updates a player's hand display
+        /// Updates a player's hand display which maps logical seat → visual position based on active seat
         /// </summary>
-        public void UpdatePlayerHand(int playerIndex, Hand hand)
+        public void UpdatePlayerHand(int seatIndex, Hand hand)
         {
-            switch (playerIndex)
+            // Get which visual position this seat should display at
+            HandView view = GetHandViewForSeat(seatIndex);
+            int visualPosition = GetVisualPositionForSeat(seatIndex);
+            
+            if (view != null)
             {
-                case 0:
-                    if (bottomPlayerHand != null)
-                        bottomPlayerHand.DisplayHand(hand);
-                    break;
-                case 1:
-                    if (rightPlayerHand != null)
-                        rightPlayerHand.DisplayHand(hand);
-                    break;
-                case 2:
-                    if (topPlayerHand != null)
-                        topPlayerHand.DisplayHand(hand);
-                    break;
-                case 3:
-                    if (leftPlayerHand != null)
-                        leftPlayerHand.DisplayHand(hand);
-                    break;
+                // Cache the hand for this position
+                handsAtPositions[visualPosition] = hand;
+                
+                // Update the display
+                view.DisplayHand(hand);
+                
+                // Set face-up only if this is the active seat
+                view.SetFaceUp(seatIndex == activeSeatIndex);
             }
         }
 
         /// <summary>
-        /// Gets the HandView for a specific player (for human player)
+        /// Maps logical seat → HandView based on rotation**
+        /// 
+        /// Example: If activeSeatIndex = 2
+        /// - Seat 2 → bottom (0 positions away from active)
+        /// - Seat 3 → right  (1 position away)
+        /// - Seat 0 → top    (2 positions away)
+        /// - Seat 1 → left   (3 positions away)
         /// </summary>
-        public HandView GetPlayerHandView(int playerIndex)
+        private HandView GetHandViewForSeat(int seatIndex)
         {
-            if (playerIndex == 0)
+            int visualPosition = GetVisualPositionForSeat(seatIndex);
+            
+            return visualPosition switch
+            {
+                0 => bottomPlayerHand,  // Active player
+                1 => rightPlayerHand,   // Next player clockwise
+                2 => topPlayerHand,     // Opposite player
+                3 => leftPlayerHand,    // Previous player
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Calculates visual position from logical seat
+        /// </summary>
+        private int GetVisualPositionForSeat(int seatIndex)
+        {
+            // How many seats clockwise from active seat?
+            return (seatIndex - activeSeatIndex + 4) % 4;
+        }
+
+        /// <summary>
+        /// Calculates logical seat from visual position
+        /// </summary>
+        private int GetSeatForVisualPosition(int visualPosition)
+        {
+            return (activeSeatIndex + visualPosition) % 4;
+        }
+
+        /// <summary>
+        /// Gets the HandView for a specific player
+        /// </summary>
+        public HandView GetPlayerHandView(int seatIndex)
+        {
+            // Only return HandView if this is the active seat
+            // (the one that should be interactive)
+            if (seatIndex == activeSeatIndex)
                 return bottomPlayerHand;
             return null;
         }
@@ -91,10 +139,15 @@ namespace MJ.UI
         /// </summary>
         public void UpdateAllPlayerHands()
         {
-            bottomPlayerHand.RefreshDisplay();
-            rightPlayerHand.RefreshDisplay();
-            topPlayerHand.RefreshDisplay();
-            leftPlayerHand.RefreshDisplay();
+            // Refresh each visual position using its cached hand
+            if (handsAtPositions[0] != null && bottomPlayerHand != null)
+                bottomPlayerHand.RefreshDisplay();
+            if (handsAtPositions[1] != null && rightPlayerHand != null)
+                rightPlayerHand.RefreshDisplay();
+            if (handsAtPositions[2] != null && topPlayerHand != null)
+                topPlayerHand.RefreshDisplay();
+            if (handsAtPositions[3] != null && leftPlayerHand != null)
+                leftPlayerHand.RefreshDisplay();
         }
 
         #endregion
@@ -118,7 +171,8 @@ namespace MJ.UI
             // Create tile view
             GameObject tileObj = Instantiate(tilePrefab, discardPileContainer);
             RectTransform rectTransform = tileObj.GetComponent<RectTransform>();
-            // start opponent view
+            
+            // Position based on grid layout
             float totalSpace = discardPileContainer.GetComponent<RectTransform>().rect.width;
             float tileSizeNoSpacing = totalSpace / discardTilesPerRow;
             float percentSpacing = 0.01f;
@@ -128,15 +182,6 @@ namespace MJ.UI
             rectTransform.anchoredPosition = new Vector2(index * spacing, 0);
             float scale = tileSizeWithSpacing / tilePrefab.GetComponent<RectTransform>().rect.width;
             rectTransform.localScale = new Vector3(scale, scale, 1);
-            // end opponent view
-            
-            // if (rectTransform != null)
-            // {
-            //     // Center the grid and offset from center
-            //     float xOffset = (col - discardTilesPerRow / 2f) * discardTileSpacing;
-            //     float yOffset = -row * discardTileSpacing;
-            //     rectTransform.anchoredPosition = new Vector2(xOffset, yOffset);
-            // }
 
             // Get sprite and setup
             Sprite sprite = spriteLibrary.GetSprite(tile.Data);
@@ -145,10 +190,6 @@ namespace MJ.UI
             if (tileView != null)
             {
                 tileView.Setup(tile, sprite, faceUp: true);
-            //     // Disable button for discard pile tiles
-            //     Button button = tileObj.GetComponent<Button>();
-            //     if (button != null)
-            //         button.interactable = false;
             }
 
             discardPileTileViews.Add(tileView);
@@ -174,7 +215,7 @@ namespace MJ.UI
         /// <summary>
         /// Updates which player's turn it is
         /// </summary>
-        public void SetCurrentTurn(int playerIndex)
+        public void SetCurrentTurn(int seatIndex)
         {
             // Hide all indicators
             if (turnIndicatorBottom != null) turnIndicatorBottom.SetActive(false);
@@ -182,8 +223,11 @@ namespace MJ.UI
             if (turnIndicatorTop != null) turnIndicatorTop.SetActive(false);
             if (turnIndicatorLeft != null) turnIndicatorLeft.SetActive(false);
 
-            // Show current player's indicator
-            switch (playerIndex)
+            // Calculate which visual position this seat is at
+            int visualPosition = GetVisualPositionForSeat(seatIndex);
+
+            // Show indicator at that position
+            switch (visualPosition)
             {
                 case 0:
                     if (turnIndicatorBottom != null) turnIndicatorBottom.SetActive(true);
@@ -205,81 +249,95 @@ namespace MJ.UI
         #region Seat Controls
 
         /// <summary>
-        /// Switch active seat and revise view
+        /// Switches active seat and rotates view**
         /// </summary>
         public void SwitchToSeat(int newSeatIndex)
         {
             if (newSeatIndex < 0 || newSeatIndex > 3) return;
-            if (newSeatIndex == currentActiveSeat) return; // Already at this seat
+            if (newSeatIndex == activeSeatIndex) return; // Already at this seat
             
-            // Deactivate old seat
-            HandView oldSeatView = GetHandViewForSeat(currentActiveSeat);
-            if (oldSeatView != null)
-            {
-                oldSeatView.SetFaceUp(false);
-            }
+            Debug.Log($"[TableLayoutView] Switching from Seat {activeSeatIndex} to Seat {newSeatIndex}");
             
-            // Activate new seat
-            HandView newSeatView = GetHandViewForSeat(newSeatIndex);
-            if (newSeatView != null)
-            {
-                newSeatView.SetFaceUp(true);
-            }
+            // Store old active seat for logging
+            int oldSeatIndex = activeSeatIndex;
             
-            currentActiveSeat = newSeatIndex;
-        }
-
-        /// <summary>
-        /// Getter for which seat view
-        /// </summary>        
-        private HandView GetHandViewForSeat(int seatIndex)
-        {
-            return seatIndex switch
-            {
-                0 => bottomPlayerHand,
-                1 => rightPlayerHand,
-                2 => topPlayerHand,
-                3 => leftPlayerHand,
-                _ => null
-            };
+            // Update active seat
+            activeSeatIndex = newSeatIndex;
+            
+            // Now we need to redistribute all hands to new visual positions
+            // Because the view has rotated, each hand needs to move to its new position
+            
+            // Strategy: We'll tell GameFlowController to refresh all hands
+            // which will call UpdatePlayerHand() for each seat, and our new
+            // GetHandViewForSeat() logic will put them in the right places
+            
+            // For now, just update face-up/face-down states for each position
+            // The actual hand data will be refreshed by GameFlowController
+            
+            // Bottom is always face-up (active seat)
+            if (bottomPlayerHand != null)
+                bottomPlayerHand.SetFaceUp(true);
+            
+            // All others are face-down
+            if (rightPlayerHand != null)
+                rightPlayerHand.SetFaceUp(false);
+            if (topPlayerHand != null)
+                topPlayerHand.SetFaceUp(false);
+            if (leftPlayerHand != null)
+                leftPlayerHand.SetFaceUp(false);
+            
+            Debug.Log($"[TableLayoutView] View rotated - Seat {newSeatIndex} now at bottom (face-up)");
         }
 
         #endregion
 
         #region Helper Methods
 
-        private void SetPlayerLabel(TMP_Text label, string text, int playerIndex)
-        {
-            if (label != null)
-            {
-                label.text = text;
-            }
-        }
-
         /// <summary>
-        /// Updates player labels with wind positions
+        /// Show seat numbers relative to visual positions**
         /// </summary>
-        public void UpdatePlayerLabels(int dealerIndex)
+        public void UpdateAllPlayerLabels(int dealerIndex)
         {
             string[] winds = { "East", "South", "West", "North" };
             
-            for (int i = 0; i < 4; i++)
+            // Update label for each visual position
+            for (int visualPos = 0; visualPos < 4; visualPos++)
             {
-                int windIndex = (i - dealerIndex + 4) % 4;
-                string windText = winds[windIndex];
-                string playerText = i == 0 ? "You" : $"Player {i}";
+                // Which seat is at this visual position?
+                int seatIndex = GetSeatForVisualPosition(visualPos);
                 
-                TMP_Text label = GetPlayerLabel(i);
+                // Calculate wind for this seat
+                int windIndex = (seatIndex - dealerIndex + 4) % 4;
+                string windText = winds[windIndex];
+                
+                // Build label text
+                string labelText;
+                if (seatIndex == activeSeatIndex)
+                {
+                    // Active seat shows "You"
+                    labelText = $"You - Seat {seatIndex} ({windText})";
+                }
+                else
+                {
+                    // Other seats show seat number
+                    labelText = $"Seat {seatIndex} ({windText})";
+                }
+                
+                // Set the label at this visual position
+                TMP_Text label = GetLabelForVisualPosition(visualPos);
                 if (label != null)
                 {
-                    label.text = $"{playerText} ({windText})";
+                    label.text = labelText;
                 }
             }
         }
 
-        private TMP_Text GetPlayerLabel(int playerIndex)
+        /// <summary>
+        /// Gets label at visual position**
+        /// </summary>
+        private TMP_Text GetLabelForVisualPosition(int visualPosition)
         {
-            return playerIndex switch
+            return visualPosition switch
             {
                 0 => bottomPlayerLabel,
                 1 => rightPlayerLabel,
@@ -289,9 +347,12 @@ namespace MJ.UI
             };
         }
 
+        /// <summary>
+        /// Gets which seat is currently active/controlled
+        /// </summary>
         public int GetActiveSeat()
         {
-            return currentActiveSeat;
+            return activeSeatIndex;
         }
 
         #endregion
