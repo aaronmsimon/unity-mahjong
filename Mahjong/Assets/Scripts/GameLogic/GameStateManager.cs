@@ -112,9 +112,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithGameStarted();
             TransitionTo(newState, "GameStart", "New game started");
-
-            gameEvents?.OnGameStarted?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(newState.CurrentPhase);
         }
 
         /// <summary>
@@ -126,9 +123,6 @@ namespace MJ.GameLogic
             newState = newState.WithTurn(currentState.DealerIndex);
             
             TransitionTo(newState, "HandStart", $"Hand started. Dealer: P{newState.DealerIndex}");
-
-            gameEvents?.OnHandStarted?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.Dealing);
         }
 
         /// <summary>
@@ -138,9 +132,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithGameEnded();
             TransitionTo(newState, "GameEnd", "Game ended");
-
-            gameEvents?.OnGameEnded?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.GameComplete);
         }
 
         #endregion
@@ -154,9 +145,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithNextTurn();
             TransitionTo(newState, "TurnAdvance", $"Turn advanced to P{newState.CurrentTurnIndex}");
-
-            gameEvents?.OnTurnChanged?.Invoke(newState.CurrentTurnIndex);
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.PlayerTurn);
         }
 
         /// <summary>
@@ -172,9 +160,6 @@ namespace MJ.GameLogic
 
             GameState newState = currentState.WithTurn(playerIndex);
             TransitionTo(newState, "TurnSet", $"Turn set to P{playerIndex}");
-
-            gameEvents?.OnTurnChanged?.Invoke(playerIndex);
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.PlayerTurn);
         }
 
         #endregion
@@ -188,8 +173,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithPhase(newPhase);
             TransitionTo(newState, "PhaseChange", $"Phase changed to {newPhase}");
-
-            gameEvents?.OnPhaseChanged?.Invoke(newPhase);
         }
 
         /// <summary>
@@ -207,9 +190,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithPhase(GamePhase.WaitingForClaims);
             TransitionTo(newState, "ClaimWindowOpen", "Claim window opened");
-
-            gameEvents?.OnClaimWindowOpened?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.WaitingForClaims);
         }
 
         /// <summary>
@@ -219,9 +199,6 @@ namespace MJ.GameLogic
         {
             GameState newState = currentState.WithPhase(GamePhase.PlayerTurn);
             TransitionTo(newState, "ClaimWindowClose", "Claim window closed");
-
-            gameEvents?.OnClaimWindowClosed?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.PlayerTurn);
         }
 
         #endregion
@@ -239,28 +216,6 @@ namespace MJ.GameLogic
                 : "Hand completed. Draw.";
             
             TransitionTo(newState, "HandComplete", description);
-
-            gameEvents?.OnHandEnded?.Invoke();
-            gameEvents?.OnPhaseChanged?.Invoke(GamePhase.HandComplete);
-
-            if (winnerIndex >= 0)
-            {
-                gameEvents?.OnPlayerWon?.Invoke(winnerIndex);
-            }
-
-            // If dealer changed, raise event
-            if (newState.DealerIndex != currentState.DealerIndex)
-            {
-                gameEvents?.OnDealerChanged?.Invoke(newState.DealerIndex);
-            }
-
-            // If prevailing wind changed, raise events
-            if (newState.PrevailingWind != currentState.PrevailingWind)
-            {
-                gameEvents?.OnPrevailingWindChanged?.Invoke(newState.PrevailingWind);
-                gameEvents?.OnRoundEnded?.Invoke();
-                gameEvents?.OnRoundStarted?.Invoke();
-            }
         }
 
         #endregion
