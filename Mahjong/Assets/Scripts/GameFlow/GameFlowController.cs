@@ -22,7 +22,6 @@ namespace MJ.GameFlow
     {
         [Header("References")]
         [SerializeField] private GameStateManager stateManager;
-        [SerializeField] private GameEvents gameEvents;
 
         [Header("UI References")]
         [SerializeField] private TableLayoutView tableLayoutView;
@@ -74,14 +73,6 @@ namespace MJ.GameFlow
 
             discardPile = new List<TileInstance>();
 
-            // Subscribe to events
-            if (gameEvents != null)
-            {
-                gameEvents.OnGameStarted.AddListener(OnGameStarted);
-                gameEvents.OnHandStarted.AddListener(OnHandStarted);
-                gameEvents.OnTurnChanged.AddListener(OnTurnChanged);
-            }
-
             // Setup claim manager
             if (claimManager != null)
             {
@@ -116,9 +107,6 @@ namespace MJ.GameFlow
                 {
                     humanHandView.OnTileDiscarded += OnPlayerDiscardedTile;
                 }
-                
-                // Subscribe to seat changes
-                tableLayoutView.OnActiveSeatChanged += OnActiveSeatChanged;
             }
         }
 
@@ -132,6 +120,16 @@ namespace MJ.GameFlow
         {
             activeSeat.Value = 0;
             stateManager.StartNewGame();
+
+            DebugLog("=== GAME STARTED ===", debugController.StartGame);
+            
+            // Start first hand
+            StartNextHand();
+
+            // if (tableLayoutView != null)
+            // {
+            //     tableLayoutView.SetCurrentTurn(0);
+            // }
         }
 
         /// <summary>
@@ -168,102 +166,6 @@ namespace MJ.GameFlow
             {
                 DebugLog($"Player {currentPlayer} has no tiles to discard!", true);
             }
-        }
-
-        #endregion
-
-        #region Event Handlers
-
-        private void OnGameStarted()
-        {
-            DebugLog("=== GAME STARTED ===", debugController.StartGame);
-            
-            // Start first hand
-            stateManager.StartNewHand();
-
-            if (tableLayoutView != null)
-            {
-                tableLayoutView.SetCurrentTurn(0);
-            }
-        }
-
-        private void OnHandStarted()
-        {
-            DebugLog("=== NEW HAND STARTED ===", debugController.StartHand);
-            
-            // Create and shuffle tiles
-            List<TileInstance> allTiles = TileFactory.CreateFullTileSet(includeFlowersAndSeasons: true);
-            DebugLog($"TileFactory: Created {allTiles.Count} tiles", debugController.TileCreation);
-            
-            // Shuffle with seed if specified
-            int currentSeed;
-            if (useRandomSeed)
-            {
-                currentSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-                TileFactory.ShuffleTiles(allTiles);
-                DebugLog("Shuffled with random seed", true);
-            }
-            else
-            {
-                currentSeed = shuffleSeed;
-                TileFactory.ShuffleTiles(allTiles, shuffleSeed);
-                DebugLog($"Shuffled with seed: {shuffleSeed}", debugController.Shuffle);
-            }
-            
-            // Initialize AI random with same seed (for reproducible AI behavior)
-            aiRandom = new System.Random(currentSeed);
-
-            // Create wall
-            wall = new Wall(allTiles, deadWallSize: 14);
-            stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
-
-            // Deal tiles to players
-            DealInitialHands();
-
-            // Update validator with current state
-            actionValidator.UpdateGameState(stateManager.State);
-
-            // Start first turn (dealer draws first)
-            DrawTileForCurrentPlayer();
-        }
-
-        private void OnTurnChanged(int newPlayerIndex)
-        {
-            // Update validator when turn changes
-            actionValidator.UpdateGameState(stateManager.State);
-            
-            // Update turn indicator
-            if (tableLayoutView != null)
-            {
-                tableLayoutView.SetCurrentTurn(newPlayerIndex);
-            }
-            
-            DebugLog($"Turn changed to Player {newPlayerIndex}", debugController.ChangeTurn);
-        }
-
-        private void OnActiveSeatChanged(int newSeatIndex)
-        {
-            // Unsubscribe from old seat's discard event
-            HandView oldView = tableLayoutView.GetPlayerHandView((int)activeSeat.Value);
-            if (oldView != null)
-            {
-                oldView.OnTileDiscarded -= OnPlayerDiscardedTile;
-            }
-            
-            // Subscribe to new seat's discard event
-            HandView newView = tableLayoutView.GetPlayerHandView(newSeatIndex);
-            if (newView != null)
-            {
-                newView.OnTileDiscarded += OnPlayerDiscardedTile;
-            }
-            
-            activeSeat.Value = newSeatIndex;
-            
-            // Update waitingForPlayerDiscard based on whether active seat matches current turn
-            int currentTurn = stateManager.GetCurrentTurn();
-            waitingForPlayerDiscard = (currentTurn == activeSeat.Value);
-            
-            DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", debugController.ChangeSeat);
         }
 
         #endregion
@@ -475,6 +377,18 @@ namespace MJ.GameFlow
         {
             stateManager.NextTurn();
             DrawTileForCurrentPlayer();
+
+            // Update validator when turn changes
+            actionValidator.UpdateGameState(stateManager.State);
+            
+            // Update turn indicator
+            int newPlayerIndex = stateManager.GetCurrentTurn();
+            if (tableLayoutView != null)
+            {
+                tableLayoutView.SetCurrentTurn(newPlayerIndex);
+            }
+            
+            DebugLog($"Turn changed to Player {newPlayerIndex}", debugController.ChangeTurn);
         }
 
         #endregion
@@ -841,6 +755,43 @@ namespace MJ.GameFlow
 
             // Start new hand
             stateManager.StartNewHand();
+
+            DebugLog("=== NEW HAND STARTED ===", debugController.StartHand);
+            
+            // Create and shuffle tiles
+            List<TileInstance> allTiles = TileFactory.CreateFullTileSet(includeFlowersAndSeasons: true);
+            DebugLog($"TileFactory: Created {allTiles.Count} tiles", debugController.TileCreation);
+            
+            // Shuffle with seed if specified
+            int currentSeed;
+            if (useRandomSeed)
+            {
+                currentSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                TileFactory.ShuffleTiles(allTiles);
+                DebugLog("Shuffled with random seed", true);
+            }
+            else
+            {
+                currentSeed = shuffleSeed;
+                TileFactory.ShuffleTiles(allTiles, shuffleSeed);
+                DebugLog($"Shuffled with seed: {shuffleSeed}", debugController.Shuffle);
+            }
+            
+            // Initialize AI random with same seed (for reproducible AI behavior)
+            aiRandom = new System.Random(currentSeed);
+
+            // Create wall
+            wall = new Wall(allTiles, deadWallSize: 14);
+            stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
+
+            // Deal tiles to players
+            DealInitialHands();
+
+            // Update validator with current state
+            actionValidator.UpdateGameState(stateManager.State);
+
+            // Start first turn (dealer draws first)
+            DrawTileForCurrentPlayer();
         }
 
         private void QuitGame()
@@ -902,11 +853,32 @@ namespace MJ.GameFlow
 
         public void SwitchToSeat()
         {
+            int newSeatIndex = (int)activeSeat.Value;
+
             if (tableLayoutView != null)
             {
-                tableLayoutView.SwitchToSeat((int)activeSeat.Value);
+                tableLayoutView.SwitchToSeat(newSeatIndex);
                 tableLayoutView.UpdateAllPlayerHands();
             }
+
+            // Unsubscribe from old seat's discard event
+            HandView oldView = tableLayoutView.GetPlayerHandView(newSeatIndex);
+            if (oldView != null)
+            {
+                oldView.OnTileDiscarded -= OnPlayerDiscardedTile;
+            }
+            
+            // Subscribe to new seat's discard event
+            HandView newView = tableLayoutView.GetPlayerHandView(newSeatIndex);
+            if (newView != null)
+            {
+                newView.OnTileDiscarded += OnPlayerDiscardedTile;
+            }
+            
+            // Update waitingForPlayerDiscard based on whether active seat matches current turn
+            int currentTurn = stateManager.GetCurrentTurn();
+            
+            DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", debugController.ChangeSeat);
         }
 
         #endregion

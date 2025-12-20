@@ -18,12 +18,6 @@ namespace MJ.GameLogic
         [SerializeField] private bool enableStateHistory = true;
         [SerializeField] private int maxHistorySize = 1000;
 
-        [Header("Event System")]
-        [SerializeField] private GameEvents gameEvents;
-
-        [Header("Current State (Read-Only)")]
-        [SerializeField, TextArea(3, 10)] private string currentStateDebug;
-
         [Header("Debug")]
         [SerializeField] private DebugControllerSO debugController;
 
@@ -39,11 +33,6 @@ namespace MJ.GameLogic
 
         private void Awake()
         {
-            if (gameEvents != null)
-            {
-                gameEvents.Initialize();
-            }
-
             if (enableStateHistory)
             {
                 stateHistory = new List<GameStateChange>();
@@ -52,7 +41,6 @@ namespace MJ.GameLogic
 
             // Initialize with default state
             currentState = GameState.CreateInitialState(playerCount, dealerRetainsSeat);
-            UpdateDebugDisplay();
         }
 
         #region State Transition (Private - Creates new state)
@@ -71,7 +59,6 @@ namespace MJ.GameLogic
                 RecordStateChange(previousState, newState, actionType, description);
             }
 
-            UpdateDebugDisplay();
             if (debugController.Transition) Debug.Log($"State Transition: {description}");
         }
 
@@ -235,7 +222,6 @@ namespace MJ.GameLogic
 
             historyIndex--;
             currentState = stateHistory[historyIndex].NewState;
-            UpdateDebugDisplay();
 
             Debug.Log($"Undo: Restored to {stateHistory[historyIndex]}");
             return true;
@@ -254,7 +240,6 @@ namespace MJ.GameLogic
 
             historyIndex++;
             currentState = stateHistory[historyIndex].NewState;
-            UpdateDebugDisplay();
 
             Debug.Log($"Redo: Applied {stateHistory[historyIndex]}");
             return true;
@@ -304,11 +289,6 @@ namespace MJ.GameLogic
         #endregion
 
         #region Debugging
-
-        private void UpdateDebugDisplay()
-        {
-            currentStateDebug = currentState.ToString();
-        }
 
         public void DebugPrintState()
         {

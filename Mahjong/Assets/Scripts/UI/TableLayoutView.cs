@@ -39,8 +39,6 @@ namespace MJ.UI
         private List<TileView> discardPileTileViews = new List<TileView>();
         private int currentActiveSeat = 0;
 
-        public System.Action<int> OnActiveSeatChanged;
-
         private void Awake()
         {
             // Setup player labels
@@ -229,9 +227,6 @@ namespace MJ.UI
             }
             
             currentActiveSeat = newSeatIndex;
-            
-            // Fire event for GameFlowController to update game logic
-            OnActiveSeatChanged?.Invoke(newSeatIndex);
         }
 
         /// <summary>
