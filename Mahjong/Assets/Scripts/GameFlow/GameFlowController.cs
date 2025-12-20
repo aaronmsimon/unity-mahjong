@@ -113,18 +113,13 @@ namespace MJ.GameFlow
 
             DebugLog("=== GAME STARTED ===", debugController.StartGame);
             
-            // Initialize view to show Seat 0 at bottom
-            if (tableLayoutView != null)
-            {
-                tableLayoutView.SwitchToSeat(0);
-            }
-
             // Start first hand
             StartNextHand();
     
             // Subscribe to active seat's discard event
             if (tableLayoutView != null)
             {
+                tableLayoutView.SetCurrentTurn(0);
                 HandView activeView = tableLayoutView.GetPlayerHandView((int)activeSeat.Value);
                 if (activeView != null)
                 {
@@ -871,6 +866,9 @@ namespace MJ.GameFlow
                 {
                     tableLayoutView.UpdatePlayerHand(i, playerHands[i]);
                 }
+
+                // Update turn indicator
+                tableLayoutView.SetCurrentTurn(stateManager.GetCurrentTurn());
             }
 
             // Update event subscription
