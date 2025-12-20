@@ -869,6 +869,28 @@ namespace MJ.GameFlow
 
                 // Update turn indicator
                 tableLayoutView.SetCurrentTurn(stateManager.GetCurrentTurn());
+
+                // Update PlayerHandController to know which seat it's controlling
+                HandView activeHandView = tableLayoutView.GetPlayerHandView(newSeatIndex);
+                if (activeHandView != null)
+                {
+                    PlayerHandController handController = activeHandView.GetComponent<PlayerHandController>();
+                    if (handController == null)
+                    {
+                        // Try parent
+                        handController = activeHandView.GetComponentInParent<PlayerHandController>();
+                    }
+                    
+                    if (handController != null)
+                    {
+                        handController.SetPlayerIndex(newSeatIndex);
+                        DebugLog($"[GameFlow] Updated PlayerHandController to control Seat {newSeatIndex}", debugController.ChangeSeat);
+                    }
+                    else
+                    {
+                        DebugLog("[GameFlow] WARNING: Could not find PlayerHandController!", true);
+                    }
+                }
             }
 
             // Update event subscription
