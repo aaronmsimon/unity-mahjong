@@ -67,6 +67,15 @@ namespace MJ.UI
             DisplayBonusTiles();
         }
 
+        /// <summary>
+        /// Flip all tiles face up
+        /// </summary>
+        public void RevealHand() {
+            foreach (TileView tile in concealedTileViews) {
+                tile.SetFaceUp(true);
+            }
+        }
+
         private void DisplayConcealedTiles()
         {
             // Clear existing tiles
