@@ -102,11 +102,21 @@ namespace MJ.UI
 
             // Get bonus tiles
             var bonusTiles = currentHand.GetBonusTiles();
+
+            List<TileInstance> visibleTiles = new List<TileInstance>();
+            visibleTiles.AddRange(bonusTiles);
+
+            // Include exposed melds in the bonus area
+            foreach (Meld meld in currentHand.GetExposedMelds()) {
+                foreach (TileInstance tile in meld.Tiles) {
+                    visibleTiles.Add(tile);
+                }
+            }
             
             // Create tile view for each
-            for (int i = 0; i < bonusTiles.Count; i++)
+            for (int i = 0; i < visibleTiles.Count; i++)
             {
-                TileView tileView = CreateTileView(bonusTiles[i], bonusTileContainer, i);
+                TileView tileView = CreateTileView(visibleTiles[i], bonusTileContainer, i);
                 // Bonus tiles are not clickable
                 bonusTileViews.Add(tileView);
             }

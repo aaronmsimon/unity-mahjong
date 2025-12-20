@@ -54,7 +54,6 @@ MonoBehaviour:
   tileImage: {fileID: 4222899932162386261}
   tileBackground: {fileID: 9070120036998402715}
   backImage: {fileID: 4054931581347792224}
-  isFaceUp: 1
 --- !u!1 &1441992734454486391
 GameObject:
   m_ObjectHideFlags: 0
