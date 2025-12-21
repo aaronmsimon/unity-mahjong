@@ -5217,7 +5217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MJ.GameFlow.ClaimManager
   stateManager: {fileID: 2030213244}
   claimWindowDuration: 5
-  autoCloseWindow: 1
+  autoCloseWindow: 0
 --- !u!4 &955659735
 Transform:
   m_ObjectHideFlags: 0

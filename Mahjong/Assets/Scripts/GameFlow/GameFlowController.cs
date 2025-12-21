@@ -968,6 +968,70 @@ namespace MJ.GameFlow
             waitingForPlayerDiscard = currentTurn == newSeatIndex;
             
             DebugLog($"Switched to Seat {newSeatIndex}. Current turn: Player {currentTurn}", debugController.ChangeSeat);
+
+            // Check if claim window should be shown for the new active seat
+            CheckAndShowClaimWindowForSeat(newSeatIndex);
+        }
+
+        /// <summary>
+        /// Checks if claim window is open and shows claim options for the specified seat
+        /// </summary>
+        private void CheckAndShowClaimWindowForSeat(int seatIndex)
+        {
+            if (claimManager == null)
+            {
+                DebugLog("No claim manager - skipping claim window check", debugController.ChangeSeat);
+                return;
+            }
+
+            // Check if claim window is currently open
+            if (!claimManager.IsClaimWindowOpen)
+            {
+                DebugLog($"Claim window not open - no claims for Seat {seatIndex}", debugController.ChangeSeat);
+                return;
+            }
+
+            // Get the discarded tile that triggered the claim window
+            TileInstance discardedTile = claimManager.GetLastDiscardedTile();
+            int discardPlayerIndex = claimManager.GetLastDiscardPlayerIndex();
+
+            if (discardedTile == null)
+            {
+                DebugLog("No discarded tile found - claim window state inconsistent", debugController.ChangeSeat);
+                return;
+            }
+
+            // Don't show claim options if this seat was the one who discarded
+            if (seatIndex == discardPlayerIndex)
+            {
+                DebugLog($"Seat {seatIndex} was the discarder - no claim options", debugController.ChangeSeat);
+                return;
+            }
+
+            // Get valid claim options for this seat
+            ClaimOptions options = claimManager.GetValidClaims(seatIndex, discardedTile.Data, playerHands[seatIndex]);
+
+            DebugLog($"Claim window open for {discardedTile.Data} from Player {discardPlayerIndex}", debugController.ChangeSeat);
+            DebugLog($"Claim options for Seat {seatIndex}: Pong={options.CanPong}, Kong={options.CanKong}, Chow={options.CanChow}, Win={options.CanWin}", debugController.ChangeSeat);
+
+            // Show claim UI if this seat has any valid claims
+            if (claimButtonsUI != null && options.HasAnyClaim)
+            {
+                claimButtonsUI.ShowClaimOptions(
+                    discardedTile.Data,
+                    options.CanPong,
+                    options.CanKong,
+                    options.CanChow,
+                    options.CanWin
+                );
+                DebugLog($"Showing claim UI for Seat {seatIndex}", debugController.ChangeSeat);
+            }
+            else if (claimButtonsUI != null)
+            {
+                // No valid claims - hide the UI
+                claimButtonsUI.HideClaimPanel();
+                DebugLog($"Seat {seatIndex} has no valid claims - hiding claim UI", debugController.ChangeSeat);
+            }
         }
 
         #endregion
