@@ -21,7 +21,6 @@ namespace MJ.UI
         [Header("Display")]
         [SerializeField] private GameObject claimPanel;
         [SerializeField] private TMP_Text discardedTileText;
-        [SerializeField] private float claimWindowDuration = 5f; // Seconds to claim
 
         // Events
         public System.Action OnPongClaimed;
@@ -29,9 +28,6 @@ namespace MJ.UI
         public System.Action OnChowClaimed;
         public System.Action OnWinClaimed;
         public System.Action OnPassClaimed;
-
-        private float claimWindowTimer;
-        private bool isClaimWindowOpen;
 
         private void Awake()
         {
@@ -49,19 +45,6 @@ namespace MJ.UI
 
             // Hide panel initially
             HideClaimPanel();
-        }
-
-        private void Update()
-        {
-            if (isClaimWindowOpen)
-            {
-                claimWindowTimer -= Time.deltaTime;
-                if (claimWindowTimer <= 0)
-                {
-                    // Auto-pass if time runs out
-                    OnPassClicked();
-                }
-            }
         }
 
         #region Public API
@@ -90,10 +73,6 @@ namespace MJ.UI
             if (passButton != null)
                 passButton.interactable = true;
 
-            // Start timer
-            claimWindowTimer = claimWindowDuration;
-            isClaimWindowOpen = true;
-
             Debug.Log($"Claim window opened for {discardedTile}. Can: Pong={canPong}, Kong={canKong}, Chow={canChow}, Win={canWin}");
         }
 
@@ -104,16 +83,6 @@ namespace MJ.UI
         {
             if (claimPanel != null)
                 claimPanel.SetActive(false);
-
-            isClaimWindowOpen = false;
-        }
-
-        /// <summary>
-        /// Gets remaining time in claim window
-        /// </summary>
-        public float GetRemainingTime()
-        {
-            return claimWindowTimer;
         }
 
         #endregion

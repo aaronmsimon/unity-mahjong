@@ -26,9 +26,10 @@ MonoBehaviour:
   StartHand: 0
   Shuffle: 0
   ChangeTurn: 0
+  ChangeSeat: 0
   DealHands: 0
   BonusTileReplacement: 0
-  ShowHand: 1
+  ShowHand: 0
   DrawTile: 0
   WallInfo: 0
   HandleDiscard: 0

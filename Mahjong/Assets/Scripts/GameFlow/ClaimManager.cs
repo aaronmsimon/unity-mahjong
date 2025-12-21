@@ -16,6 +16,8 @@ namespace MJ.GameFlow
 
         [Header("Configuration")]
         [SerializeField] private float claimWindowDuration = 5f;
+        [Tooltip("If false, claim window stays open until player makes a decision")]
+        [SerializeField] private bool autoCloseWindow = true;
 
         // Current claim state
         private bool isClaimWindowOpen;
@@ -47,7 +49,7 @@ namespace MJ.GameFlow
 
         private void Update()
         {
-            if (isClaimWindowOpen)
+            if (isClaimWindowOpen && autoCloseWindow)
             {
                 claimWindowTimer -= Time.deltaTime;
                 if (claimWindowTimer <= 0)
