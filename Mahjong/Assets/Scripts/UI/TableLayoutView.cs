@@ -29,7 +29,6 @@ namespace MJ.UI
         [SerializeField] private Transform discardPileContainer;
         [SerializeField] private GameObject tilePrefab;
         [SerializeField] private TileSpriteLibrarySO spriteLibrary;
-        [SerializeField] private int discardTilesPerRow = 6;
 
         [Header("Turn Indicator")]
         [SerializeField] private GameObject turnIndicatorBottom;
@@ -159,29 +158,10 @@ namespace MJ.UI
         /// </summary>
         public void AddDiscardedTile(TileInstance tile)
         {
-            if (discardPileContainer == null || tilePrefab == null || spriteLibrary == null)
-                return;
-
-            int index = discardPileTileViews.Count;
-            
-            // Calculate position in grid
-            int row = index / discardTilesPerRow;
-            int col = index % discardTilesPerRow;
+            if (discardPileContainer == null || tilePrefab == null || spriteLibrary == null) return;
 
             // Create tile view
             GameObject tileObj = Instantiate(tilePrefab, discardPileContainer);
-            RectTransform rectTransform = tileObj.GetComponent<RectTransform>();
-            
-            // Position based on grid layout
-            float totalSpace = discardPileContainer.GetComponent<RectTransform>().rect.width;
-            float tileSizeNoSpacing = totalSpace / discardTilesPerRow;
-            float percentSpacing = 0.01f;
-            float tileSpacing = tileSizeNoSpacing * percentSpacing;
-            float tileSizeWithSpacing = (totalSpace - tileSpacing * (discardTilesPerRow - 1)) / discardTilesPerRow;
-            float spacing = tileSpacing + tileSizeWithSpacing;
-            rectTransform.anchoredPosition = new Vector2(index * spacing, 0);
-            float scale = tileSizeWithSpacing / tilePrefab.GetComponent<RectTransform>().rect.width;
-            rectTransform.localScale = new Vector3(scale, scale, 1);
 
             // Get sprite and setup
             Sprite sprite = spriteLibrary.GetSprite(tile.Data);

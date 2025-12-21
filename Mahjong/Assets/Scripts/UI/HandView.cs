@@ -87,7 +87,7 @@ namespace MJ.UI
             // Create tile view for each
             for (int i = 0; i < tiles.Count; i++)
             {
-                TileView tileView = CreateTileView(tiles[i], tileContainer, i);
+                TileView tileView = CreateTileView(tiles[i], tileContainer, i, isFaceUp);
                 tileView.OnTileClicked += OnTileClicked;
                 concealedTileViews.Add(tileView);
             }
@@ -116,13 +116,13 @@ namespace MJ.UI
             // Create tile view for each
             for (int i = 0; i < visibleTiles.Count; i++)
             {
-                TileView tileView = CreateTileView(visibleTiles[i], bonusTileContainer, i);
+                TileView tileView = CreateTileView(visibleTiles[i], bonusTileContainer, i, true);
                 // Bonus tiles are not clickable
                 bonusTileViews.Add(tileView);
             }
         }
 
-        private TileView CreateTileView(TileInstance tile, Transform parent, int index)
+        private TileView CreateTileView(TileInstance tile, Transform parent, int index, bool isFaceUp)
         {
             GameObject tileObj = Instantiate(tilePrefab, parent);
             float totalSpace = parent.GetComponent<RectTransform>().rect.width;
