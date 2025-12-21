@@ -147,8 +147,9 @@ namespace MJ.GameFlow
         {
             if (pendingClaims.Count == 0)
             {
-                // No claims - continue normal play
+                // No claims - notify with sentinal value (-1)
                 Debug.Log("No claims - continuing");
+                OnClaimResolved?.Invoke(-1, ClaimType.Pong, lastDiscardedTile); // -1 = no winner, ClaimType doesn't matter
                 CloseClaimWindow();
                 return;
             }

@@ -78,7 +78,6 @@ namespace MJ.GameFlow
             {
                 claimManager.SetActionValidator(actionValidator);
                 claimManager.OnClaimWindowOpened += OnClaimWindowOpened;
-                claimManager.OnClaimWindowClosed += OnClaimWindowClosed;
                 claimManager.OnClaimResolved += OnClaimResolved;
             }
 
@@ -359,26 +358,67 @@ namespace MJ.GameFlow
             else
             {
                 // No claim manager - just advance
-                AdvanceToNextPlayer();
+                AdvanceToNextPlayerAndDraw("no claim system");
             }
         }
 
-        private void AdvanceToNextPlayer()
-        {
-            stateManager.NextTurn();
-            DrawTileForCurrentPlayer();
+        #endregion
 
-            // Update validator when turn changes
+        #region Turn Management (Centralized)
+
+        /// <summary>
+        /// Central turn management - ALL turn changes must go through here
+        /// Updates state, validator, UI, and player-specific flags
+        /// </summary>
+        /// <param name="playerIndex">Which player's turn it is now</param>
+        /// <param name="reason">Debug/logging context for why turn changed</param>
+        private void SetCurrentPlayer(int playerIndex, string reason)
+        {
+            // Validate player index
+            if (playerIndex < 0 || playerIndex >= 4)
+            {
+                DebugLog($"ERROR: Invalid player index {playerIndex}", true);
+                return;
+            }
+
+            // Update game state
+            stateManager.SetTurn(playerIndex);
+            
+            // Update validator with new state
             actionValidator.UpdateGameState(stateManager.State);
             
-            // Update turn indicator
-            int newPlayerIndex = stateManager.GetCurrentTurn();
+            // Update UI turn indicator
             if (tableLayoutView != null)
             {
-                tableLayoutView.SetCurrentTurn(newPlayerIndex);
+                tableLayoutView.SetCurrentTurn(playerIndex);
             }
             
-            DebugLog($"Turn changed to Player {newPlayerIndex}", debugController.ChangeTurn);
+            // Set waiting flag based on active seat
+            waitingForPlayerDiscard = (playerIndex == activeSeat.Value);
+            
+            // Debug logging
+            DebugLog($"Turn → Player {playerIndex} [{reason}]", debugController.ChangeTurn);
+            
+            // Future extension point: animations, events, networking, etc.
+            // OnTurnChanged?.Invoke(playerIndex, reason);
+        }
+
+        /// <summary>
+        /// Advances to the next player in turn order and draws their tile
+        /// This is the standard game flow advancement
+        /// </summary>
+        /// <param name="reason">Context for logging/debugging</param>
+        private void AdvanceToNextPlayerAndDraw(string reason = "normal flow")
+        {
+            // Advance turn in state (handles wraparound)
+            stateManager.NextTurn();
+            int nextPlayer = stateManager.GetCurrentTurn();
+            
+            // Set turn (updates UI, validator, etc.)
+            SetCurrentPlayer(nextPlayer, reason);
+            
+            // Draw tile for the new current player
+            DrawTileForCurrentPlayer();
         }
 
         #endregion
@@ -415,8 +455,15 @@ namespace MJ.GameFlow
             // Record discard
             stateManager.SetLastDiscardPlayer(currentPlayer);
 
-            // Advance turn
-            AdvanceToNextPlayer();
+            // Open claim window (even though it's just one player for now)
+            if (claimManager != null)
+            {
+                claimManager.OpenClaimWindow(tile, currentPlayer);
+            }
+            else
+            {
+                AdvanceToNextPlayerAndDraw("player discarded");
+            }
         }
 
         #endregion
@@ -455,11 +502,7 @@ namespace MJ.GameFlow
             }
 
             // TODO: Check AI players and auto-claim for them
-            // For now, they auto-pass
-        }
-
-        private void OnClaimWindowClosed() {
-            AdvanceToNextPlayer();
+            // For now, they auto-pass after human player resolves
         }
 
         private void OnPlayerClaim(ClaimType claimType)
@@ -476,40 +519,48 @@ namespace MJ.GameFlow
 
         private void OnClaimResolved(int winnerIndex, ClaimType claimType, TileInstance claimedTile)
         {
+            // Handle "no claims" case (sentinel value)
+            if (winnerIndex < 0)
+            {
+                DebugLog("No claims made - advancing to next player", debugController.ClaimResolved);
+                claimManager.CloseClaimWindow();
+                AdvanceToNextPlayerAndDraw("no claims");
+                return;
+            }
+            
             DebugLog($"Claim resolved: Player {winnerIndex} claimed {claimType} with {claimedTile.Data}", debugController.ClaimResolved);
 
-            // Form the meld based on claim type
+            // Handle based on claim type
             switch (claimType)
             {
+                case ClaimType.Win:
+                    HandleWinFromClaim(winnerIndex, claimedTile);
+                    return; // Game ends, no turn change needed
+                    
                 case ClaimType.Pong:
                     FormPongFromClaim(winnerIndex, claimedTile);
                     break;
+                    
                 case ClaimType.Kong:
                     FormKongFromClaim(winnerIndex, claimedTile);
                     break;
+                    
                 case ClaimType.Chow:
                     FormChowFromClaim(winnerIndex, claimedTile);
                     break;
-                case ClaimType.Win:
-                    HandleWinFromClaim(winnerIndex, claimedTile);
-                    return; // Don't continue - game ends
             }
 
-            // Update display
+            // Update display after forming meld
             if (tableLayoutView != null)
             {
                 tableLayoutView.UpdatePlayerHand(winnerIndex, playerHands[winnerIndex]);
             }
 
-            // Claimer's turn
-            stateManager.SetTurn(winnerIndex);
-            waitingForPlayerDiscard = (winnerIndex == 0);
-
-            if (winnerIndex != 0)
-            {
-                // AI player - auto discard for now
-                DebugLog($"Player {winnerIndex} must discard after claim", debugController.ClaimResolved);
-            }
+            // Set turn to claimer - they must discard now
+            SetCurrentPlayer(winnerIndex, $"claimed {claimType}");
+            
+            // Close claim window (no event subscription, so no side effects)
+            claimManager.CloseClaimWindow();
         }
 
         private void FormPongFromClaim(int playerIndex, TileInstance claimedTile)
@@ -783,8 +834,9 @@ namespace MJ.GameFlow
                 tableLayoutView.UpdateAllPlayerLabels(stateManager.State.DealerIndex);
             }
 
-            // Update validator with current state
-            actionValidator.UpdateGameState(stateManager.State);
+            // Set turn to dealer explicitly
+            int dealerIndex = stateManager.State.DealerIndex;
+            SetCurrentPlayer(dealerIndex, "dealer starts hand");
 
             // Start first turn (dealer draws first)
             DrawTileForCurrentPlayer();
