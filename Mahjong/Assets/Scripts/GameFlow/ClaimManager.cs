@@ -160,7 +160,7 @@ namespace MJ.GameFlow
             if (winningPlayerIndex < 0)
             {
                 Debug.LogError("Failed to resolve claims");
-                CloseClaimWindow();
+                CloseClaimWindow();  // ← Close on error
                 return;
             }
 
@@ -170,7 +170,7 @@ namespace MJ.GameFlow
             if (winningClaim == null)
             {
                 Debug.LogError("Could not find winning claim");
-                CloseClaimWindow();
+                CloseClaimWindow();  // ← Close on error
                 return;
             }
 
@@ -178,8 +178,6 @@ namespace MJ.GameFlow
 
             // Notify listeners
             OnClaimResolved?.Invoke(winningPlayerIndex, winningClaim.Type, lastDiscardedTile);
-
-            CloseClaimWindow();
         }
 
         #endregion
