@@ -809,7 +809,7 @@ namespace MJ.GameFlow
             {
                 currentSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
                 TileFactory.ShuffleTiles(allTiles);
-                DebugLog("Shuffled with random seed", true);
+                DebugLog($"Shuffled with random seed: {currentSeed}", debugController.Shuffle);
             }
             else
             {
