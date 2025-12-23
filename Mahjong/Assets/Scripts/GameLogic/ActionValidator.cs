@@ -255,9 +255,9 @@ namespace MJ.GameLogic
         /// </summary>
         private int GetMeldsRequired()
         {
-            // Default to Hong Kong (4 melds)
             // In a full implementation, this would come from ruleSet
-            return ruleSet.HandSize == 16 ? 5 : 4;
+            // In the mean time, keep draw and need a pair, difference is melds which are always of 3
+            return ruleSet.HandSize - 1 / 3;
         }
 
         #endregion
