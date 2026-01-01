@@ -1,4 +1,5 @@
 using UnityEngine;
+using MJ.GameFlow;
 
 namespace MJ.Core.Tiles
 {
@@ -14,6 +15,9 @@ namespace MJ.Core.Tiles
         // Mutable game state
         public bool IsConcealed { get; set; }
         public GameObject TileObject { get; set; }
+
+        // Location tracking for debug, undo/redo, and replay
+        public TileLocationInfo Location { get; private set; }
         
         /// <summary>
         /// Constructor
@@ -23,6 +27,16 @@ namespace MJ.Core.Tiles
             Data = data;
             IsConcealed = true;  // Tiles start concealed by default
             TileObject = null;
+            Location = new TileLocationInfo(LocationType.Unknown);
+        }
+
+        /// <summary>
+        /// Sets the current location of this tile
+        /// Internal - only specific systems should update location
+        /// </summary>
+        internal void SetLocation(LocationType type, int playerIndex = -1, int meldIndex = -1)
+        {
+            Location = new TileLocationInfo(type, playerIndex, meldIndex);
         }
 
         /// <summary>

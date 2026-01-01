@@ -53,6 +53,9 @@ namespace MJ.GameFlow
         // Random number generator for AI (seeded for reproducibility)
         private System.Random aiRandom;
 
+        // Tile lookup for instant access by ID
+        private Dictionary<int, TileInstance> allTiles;
+
         private void Awake()
         {
             // Initialize rule set
@@ -68,6 +71,8 @@ namespace MJ.GameFlow
             playerHands = new List<Hand>();
             for (int i = 0; i < 4; i++)
             {
+                Hand hand = new Hand();
+                hand.SetPlayerIndex(i);
                 playerHands.Add(new Hand());
             }
 
@@ -210,7 +215,7 @@ namespace MJ.GameFlow
             if (tile.Data.IsBonus())
             {
                 // Add bonus tile
-                playerHands[playerIndex].AddTile(tile);
+                playerHands[playerIndex].AddTile(tile, playerIndex);
                 DebugLog($"Player {playerIndex} got bonus tile: {tile.Data} - drawing replacement", debugController.BonusTileReplacement);
                 
                 // Draw replacement from dead wall
@@ -223,7 +228,7 @@ namespace MJ.GameFlow
             else
             {
                 // Normal tile - just add it
-                playerHands[playerIndex].AddTile(tile);
+                playerHands[playerIndex].AddTile(tile, playerIndex);
             }
         }
 
@@ -243,7 +248,7 @@ namespace MJ.GameFlow
             }
 
             // Add the non-bonus tile to hand
-            playerHands[currentPlayer].AddTile(drawnTile);
+            playerHands[currentPlayer].AddTile(drawnTile, currentPlayer);
             playerHands[currentPlayer].SortTiles(debugController.SortTiles);
             stateManager.SetTilesRemainingInWall(wall.DrawPileCount);
 
@@ -303,7 +308,7 @@ namespace MJ.GameFlow
             // If it's a bonus tile, add it and draw replacement
             while (drawnTile != null && drawnTile.Data.IsBonus())
             {
-                playerHands[playerIndex].AddTile(drawnTile); // Hand will separate it automatically
+                playerHands[playerIndex].AddTile(drawnTile, playerIndex); // Hand will separate it automatically
                 DebugLog($"Player {playerIndex} drew bonus tile: {drawnTile.Data} - drawing replacement from dead wall", debugController.BonusTileReplacement);
                 
                 // Draw replacement from dead wall
@@ -332,6 +337,7 @@ namespace MJ.GameFlow
             // Remove from hand
             hand.RemoveTile(tileToDiscard);
             discardPile.Add(tileToDiscard);
+            tileToDiscard.SetLocation(LocationType.DiscardPile);
 
             DebugLog($"Player {playerIndex} discarded: {tileToDiscard.Data}", debugController.DiscardTile);
 
@@ -803,6 +809,9 @@ namespace MJ.GameFlow
             List<TileInstance> allTiles = TileFactory.CreateFullTileSet(includeFlowersAndSeasons: true);
             DebugLog($"TileFactory: Created {allTiles.Count} tiles", debugController.TileCreation);
             
+            // Initialize tile lookup dictionary
+            InitializeTileTracking(allTiles);
+
             // Shuffle with seed if specified
             int currentSeed;
             if (useRandomSeed)
@@ -1034,6 +1043,191 @@ namespace MJ.GameFlow
             }
         }
 
+        #endregion
+
+        /// <summary>
+        /// Initializes tile tracking system
+        /// Creates lookup dictionary and sets initial locations
+        /// </summary>
+        private void InitializeTileTracking(List<TileInstance> tiles)
+        {
+            allTiles = tiles.ToDictionary(t => t.TileId);
+            DebugLog($"Initialized tile tracking for {allTiles.Count} tiles", true);
+        }
+
+        #region Tile Swapping (Debug)
+
+        /// <summary>
+        /// Finds all 4 instances of a specific tile type
+        /// Uses instant lookup via location tracking
+        /// </summary>
+        public List<TileLocation> FindAllTilesOfType(TileData searchType)
+        {
+            if (allTiles == null)
+            {
+                DebugLog("Tile tracking not initialized!", true);
+                return new List<TileLocation>();
+            }
+
+            // Instant lookup - filter by type
+            return allTiles.Values
+                .Where(t => t.Data.IsSameType(searchType))
+                .Select(t => new TileLocation(t))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Finds a tile by its ID (instant O(1) lookup)
+        /// </summary>
+        public TileInstance FindTileById(int tileId)
+        {
+            return allTiles != null && allTiles.ContainsKey(tileId) ? allTiles[tileId] : null;
+        }
+
+        /// <summary>
+        /// Swaps two tiles in the game
+        /// Maintains game integrity - tiles just exchange positions
+        /// Cannot swap tiles that are in melds (to avoid illegal game states)
+        /// </summary>
+        public bool SwapTiles(TileLocation location1, TileLocation location2)
+        {
+            // Validate: cannot swap tiles in melds
+            if (location1.Type == LocationType.PlayerMeld)
+            {
+                DebugLog("Cannot swap tiles in melds (would create illegal state)", true);
+                return false;
+            }
+            if (location2.Type == LocationType.PlayerMeld)
+            {
+                DebugLog("Cannot swap tiles in melds (would create illegal state)", true);
+                return false;
+            }
+
+            // Get the tile instances
+            TileInstance tile1 = location1.Tile;
+            TileInstance tile2 = location2.Tile;
+
+            // Store original locations
+            TileLocationInfo loc1 = tile1.Location;
+            TileLocationInfo loc2 = tile2.Location;
+
+            DebugLog($"Swapping: {location1.DisplayString} <-> {location2.DisplayString}", true);
+
+            // Remove both tiles from their current locations
+            bool removed1 = RemoveTileFromLocation(tile1);
+            bool removed2 = RemoveTileFromLocation(tile2);
+
+            if (!removed1 || !removed2)
+            {
+                DebugLog("ERROR: Failed to remove tiles from locations", true);
+                return false;
+            }
+
+            // Add them to their new locations (swapped)
+            bool added1 = AddTileToLocation(tile1, loc2);
+            bool added2 = AddTileToLocation(tile2, loc1);
+
+            if (!added1 || !added2)
+            {
+                DebugLog("ERROR: Failed to add tiles to new locations", true);
+                return false;
+            }
+
+            // Refresh displays
+            RefreshAllDisplays();
+
+            DebugLog("Tile swap successful!", true);
+            return true;
+        }
+
+        /// <summary>
+        /// Removes a tile from its current location
+        /// Uses tile's stored location info
+        /// </summary>
+        private bool RemoveTileFromLocation(TileInstance tile)
+        {
+            var loc = tile.Location;
+            
+            switch (loc.Type)
+            {
+                case LocationType.PlayerHand:
+                    return playerHands[loc.PlayerIndex].RemoveTile(tile);
+
+                case LocationType.PlayerBonus:
+                    return playerHands[loc.PlayerIndex].RemoveBonusTile(tile);
+
+                case LocationType.Wall:
+                    return wall.RemoveTileFromDrawPile(tile);
+
+                case LocationType.DeadWall:
+                    return wall.RemoveTileFromDeadWall(tile);
+
+                case LocationType.DiscardPile:
+                    return discardPile.Remove(tile);
+
+                default:
+                    DebugLog($"Cannot remove from location type: {loc.Type}", true);
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Adds a tile to a new location
+        /// Sets the tile's location tracking
+        /// </summary>
+        private bool AddTileToLocation(TileInstance tile, TileLocationInfo targetLocation)
+        {
+            switch (targetLocation.Type)
+            {
+                case LocationType.PlayerHand:
+                    playerHands[targetLocation.PlayerIndex].AddTile(tile, targetLocation.PlayerIndex);
+                    playerHands[targetLocation.PlayerIndex].SortTiles(debugController.SortTiles);
+                    return true;
+
+                case LocationType.PlayerBonus:
+                    playerHands[targetLocation.PlayerIndex].AddBonusTileDirect(tile, targetLocation.PlayerIndex);
+                    return true;
+
+                case LocationType.Wall:
+                    wall.AddTileToDrawPile(tile);
+                    return true;
+
+                case LocationType.DeadWall:
+                    wall.AddTileToDeadWall(tile);
+                    return true;
+
+                case LocationType.DiscardPile:
+                    discardPile.Add(tile);
+                    tile.SetLocation(LocationType.DiscardPile);
+                    return true;
+
+                default:
+                    DebugLog($"Cannot add to location type: {targetLocation.Type}", true);
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Refreshes all UI displays after tile swap
+        /// </summary>
+        private void RefreshAllDisplays()
+        {
+            if (tableLayoutView == null) return;
+
+            // Update all player hands
+            for (int i = 0; i < playerHands.Count; i++)
+            {
+                tableLayoutView.UpdatePlayerHand(i, playerHands[i]);
+            }
+
+            // Clear and rebuild discard pile display
+            tableLayoutView.ClearDiscardPile();
+            foreach (var tile in discardPile)
+            {
+                tableLayoutView.AddDiscardedTile(tile);
+            }
+        }
+        
         #endregion
 
         #region Testing

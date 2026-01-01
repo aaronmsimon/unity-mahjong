@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using MJ.UI;
 using TMPro;
 using RoboRyanTron.Unite2017.Events;
 using RoboRyanTron.Unite2017.Variables;
@@ -29,6 +30,10 @@ namespace MJ.Testing
 
         [Header("Section: Hand Editor")]
         [SerializeField] private Button exchangeTileButton;
+
+        [Header("Section: Tile Swap")]
+        [SerializeField] private TileSwapUI tileSwapUI;
+        [SerializeField] private Button openTileSwapButton;
 
         // Panel state
         private bool isPanelOpen;
@@ -70,6 +75,11 @@ namespace MJ.Testing
             if (toggleButton != null)
             {
                 toggleButton.onClick.AddListener(TogglePanel);
+            }
+
+            if (openTileSwapButton != null)
+            {
+                openTileSwapButton.onClick.AddListener(OpenTileSwap);
             }
         }
 
@@ -172,6 +182,18 @@ namespace MJ.Testing
         public void SetActiveSeat(int activeSeat) {
             this.activeSeat.Value = activeSeat;
             switchToSeat.Raise();
+        }
+
+        public void OpenTileSwap()
+        {
+            if (tileSwapUI != null)
+            {
+                tileSwapUI.ShowPanel();
+            }
+            else
+            {
+                Debug.LogError("TileSwapUI not assigned!");
+            }
         }
 
         #endregion

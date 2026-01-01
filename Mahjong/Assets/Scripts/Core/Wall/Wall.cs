@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MJ.Core.Tiles;
+using MJ.GameFlow;
 
 namespace MJ.Core.Wall
 {
@@ -56,6 +57,15 @@ namespace MJ.Core.Wall
             drawPile = tiles.GetRange(0, drawPileSize);
             deadWall = tiles.GetRange(drawPileSize, tiles.Count - drawPileSize);
 
+            foreach (var tile in drawPile)
+            {
+                tile.SetLocation(LocationType.Wall);
+            }
+            foreach (var tile in deadWall)
+            {
+                tile.SetLocation(LocationType.DeadWall);
+            }
+
             Debug.Log($"Wall created: {drawPile.Count} in draw pile, {deadWall.Count} in dead wall");
         }
 
@@ -76,6 +86,8 @@ namespace MJ.Core.Wall
             TileInstance tile = drawPile[0];
             drawPile.RemoveAt(0);
             drawnTiles.Add(tile);
+
+            tile.SetLocation(LocationType.Unknown);
             
             return tile;
         }
@@ -142,6 +154,8 @@ namespace MJ.Core.Wall
             TileInstance tile = deadWall[0];
             deadWall.RemoveAt(0);
             drawnTiles.Add(tile);
+
+            tile.SetLocation(LocationType.Unknown);
             
             // Replenish dead wall from draw pile if possible
             if (drawPile.Count > 0)
@@ -149,6 +163,7 @@ namespace MJ.Core.Wall
                 TileInstance replenish = drawPile[drawPile.Count - 1];
                 drawPile.RemoveAt(drawPile.Count - 1);
                 deadWall.Add(replenish);
+                replenish.SetLocation(LocationType.DeadWall);
             }
 
             return tile;
@@ -270,6 +285,57 @@ namespace MJ.Core.Wall
             drawnTiles.Clear();
 
             Debug.Log($"Wall reset: {drawPile.Count} in draw pile, {deadWall.Count} in dead wall");
+        }
+        
+        /// <summary>
+        /// Removes a specific tile from the draw pile (for debug/testing)
+        /// </summary>
+        public bool RemoveTileFromDrawPile(TileInstance tile)
+        {
+            if (drawPile.Contains(tile))
+            {
+                drawPile.Remove(tile);
+                tile.SetLocation(LocationType.Unknown);
+                Debug.Log($"Removed {tile.Data} from draw pile");
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes a specific tile from the dead wall (for debug/testing)
+        /// </summary>
+        public bool RemoveTileFromDeadWall(TileInstance tile)
+        {
+            if (deadWall.Contains(tile))
+            {
+                deadWall.Remove(tile);
+                tile.SetLocation(LocationType.Unknown);
+                Debug.Log($"Removed {tile.Data} from dead wall");
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a tile to the draw pile (for debug/testing)
+        /// Adds to the end of the pile
+        /// </summary>
+        public void AddTileToDrawPile(TileInstance tile)
+        {
+            drawPile.Add(tile);
+            tile.SetLocation(LocationType.Wall);
+            Debug.Log($"Added {tile.Data} to draw pile");
+        }
+
+        /// <summary>
+        /// Adds a tile to the dead wall (for debug/testing)
+        /// </summary>
+        public void AddTileToDeadWall(TileInstance tile)
+        {
+            deadWall.Add(tile);
+            tile.SetLocation(LocationType.DeadWall);
+            Debug.Log($"Added {tile.Data} to dead wall");
         }
 
         #endregion

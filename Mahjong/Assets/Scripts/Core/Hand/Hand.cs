@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MJ.Core.Tiles;
-using MJ.Testing;
+using MJ.GameFlow;
 
 namespace MJ.Core.Hand
 {
@@ -34,16 +34,20 @@ namespace MJ.Core.Hand
         /// Adds a tile to the hand
         /// Automatically separates bonus tiles
         /// </summary>
-        public void AddTile(TileInstance tile)
+        public void AddTile(TileInstance tile, int playerIndex = -1)
         {
             if (tile.Data.IsBonus())
             {
                 bonusTiles.Add(tile);
+                if (playerIndex >= 0)
+                    tile.SetLocation(LocationType.PlayerBonus, playerIndex);
             }
             else
             {
                 concealedTiles.Add(tile);
                 tile.IsConcealed = true;
+                if (playerIndex >= 0)
+                    tile.SetLocation(LocationType.PlayerHand, playerIndex);
             }
         }
 
@@ -63,7 +67,34 @@ namespace MJ.Core.Hand
         /// </summary>
         public bool RemoveTile(TileInstance tile)
         {
-            return concealedTiles.Remove(tile);
+            bool removed = concealedTiles.Remove(tile);
+            if (removed)
+                tile.SetLocation(LocationType.Unknown);
+            return removed;
+        }
+
+        /// <summary>
+        /// Removes a specific bonus tile (for debug/testing)
+        /// </summary>
+        public bool RemoveBonusTile(TileInstance tile)
+        {
+            if (bonusTiles.Contains(tile))
+            {
+                bonusTiles.Remove(tile);
+                tile.SetLocation(LocationType.Unknown);  // Clear location
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a tile directly to bonus tiles (for debug/testing)
+        /// Bypasses normal bonus tile detection
+        /// </summary>
+        public void AddBonusTileDirect(TileInstance tile, int playerIndex)
+        {
+            bonusTiles.Add(tile);
+            tile.SetLocation(LocationType.PlayerBonus, playerIndex);
         }
 
         /// <summary>
@@ -87,11 +118,15 @@ namespace MJ.Core.Hand
         {
             exposedMelds.Add(meld);
             
+            int meldIndex = exposedMelds.Count - 1;
+
             // Remove the tiles used in the meld from concealed tiles
             foreach (var tile in meld.Tiles)
             {
                 concealedTiles.Remove(tile);
                 tile.IsConcealed = false;
+                if (playerIndex >= 0)
+                    tile.SetLocation(LocationType.PlayerMeld, playerIndex, meldIndex);
             }
         }
 
@@ -244,6 +279,27 @@ namespace MJ.Core.Hand
             }
             
             return result;
+        }
+
+        /// <summary>
+        /// Sets the player index for this hand (for location tracking)
+        /// Call this when the hand is assigned to a player
+        /// </summary>
+        private int playerIndex = -1;
+        
+        public void SetPlayerIndex(int index)
+        {
+            playerIndex = index;
+            
+            // Update all existing tiles with correct player index
+            foreach (var tile in concealedTiles)
+            {
+                tile.SetLocation(LocationType.PlayerHand, playerIndex);
+            }
+            foreach (var tile in bonusTiles)
+            {
+                tile.SetLocation(LocationType.PlayerBonus, playerIndex);
+            }
         }
 
         #endregion
