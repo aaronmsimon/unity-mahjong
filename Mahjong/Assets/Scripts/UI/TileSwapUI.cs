@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using MJ.Core.Tiles;
 using MJ.GameFlow;
+using MJ.Core.Hand;
 
 namespace MJ.UI
 {
@@ -15,6 +16,7 @@ namespace MJ.UI
     {
         [Header("References")]
         [SerializeField] private GameFlowController gameFlowController;
+        [SerializeField] private TableLayoutView tableLayoutView;
 
         [Header("Panel")]
         [SerializeField] private GameObject swapPanel;
@@ -114,6 +116,7 @@ namespace MJ.UI
             ClearSourceList();
             ClearDestList();
             UpdateUI();
+            DisplayDestinations();
         }
 
         #endregion
@@ -223,7 +226,6 @@ namespace MJ.UI
         private void DisplayLocations()
         {
             ClearSourceList();
-            ClearDestList();
 
             if (foundLocations == null || foundLocations.Count == 0)
             {
@@ -242,7 +244,21 @@ namespace MJ.UI
                 }
 
                 CreateLocationItem(location, sourceListContainer, sourceItems, true);
-                CreateLocationItem(location, destListContainer, destItems, false);
+            }
+        }
+
+        private void DisplayDestinations() {
+            if (tableLayoutView != null) {
+                int activeSeat = tableLayoutView.GetActiveSeat();
+                HandView handView = tableLayoutView.GetHandViewForSeat(activeSeat);
+                Hand hand = handView.GetHand();
+                List<TileInstance> tiles = hand.GetAllTiles();
+
+                foreach (TileInstance tileInstance in tiles) {
+                    CreateLocationItem(new TileLocation(tileInstance), destListContainer, destItems, false);
+                }
+            } else {
+                Debug.Log("Table Layout View not set!");
             }
         }
 

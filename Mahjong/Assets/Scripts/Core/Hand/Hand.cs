@@ -302,6 +302,18 @@ namespace MJ.Core.Hand
             }
         }
 
+        public List<TileInstance> GetAllTiles() {
+            List<TileInstance> tiles = new List<TileInstance>();
+            tiles.AddRange(concealedTiles);
+            tiles.AddRange(bonusTiles);
+            foreach (Meld meld in exposedMelds) {
+                foreach (TileInstance tileInstance in meld.Tiles) {
+                    tiles.Add(tileInstance);
+                }
+            }
+            return tiles;
+        }
+
         #endregion
 
         #region Validation Helpers
