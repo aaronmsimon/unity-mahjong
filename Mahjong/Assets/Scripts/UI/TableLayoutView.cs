@@ -90,7 +90,7 @@ namespace MJ.UI
         /// - Seat 0 → top    (2 positions away)
         /// - Seat 1 → left   (3 positions away)
         /// </summary>
-        private HandView GetHandViewForSeat(int seatIndex)
+        public HandView GetHandViewForSeat(int seatIndex)
         {
             int visualPosition = GetVisualPositionForSeat(seatIndex);
             
