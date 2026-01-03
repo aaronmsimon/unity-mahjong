@@ -1,6 +1,6 @@
 using System;
 
-namespace MJ.Core.Tiles
+namespace MJ.Core.Tiles2
 {
     /// <summary>
     /// Suit types for Mahjong tiles
@@ -41,20 +41,19 @@ namespace MJ.Core.Tiles
     /// Immutable struct representing a Mahjong tile's identity
     /// Each physical tile in the game has unique data
     /// </summary>
-    public readonly struct TileData : IEquatable<TileData>
+    public readonly struct TileType : IEquatable<TileType>
     {
         public TileSuit Suit { get; }
         public int Number { get; }  // 1-9 for suited tiles, 1-4 for Flowers/Seasons
         public WindType? Wind { get; }
         public DragonType? Dragon { get; }
-        public int TileId { get; }  // Unique ID for each physical tile
 
         #region Constructors
 
         /// <summary>
         /// Constructor for suited tiles (Bamboo, Characters, Dots)
         /// </summary>
-        public TileData(TileSuit suit, int number, int tileId)
+        public TileType(TileSuit suit, int number)
         {
             if (suit != TileSuit.Bamboo && suit != TileSuit.Characters && suit != TileSuit.Dots &&
                 suit != TileSuit.Flower && suit != TileSuit.Season)
@@ -71,31 +70,28 @@ namespace MJ.Core.Tiles
             Number = number;
             Wind = null;
             Dragon = null;
-            TileId = tileId;
         }
 
         /// <summary>
         /// Constructor for Wind tiles
         /// </summary>
-        public TileData(WindType wind, int tileId)
+        public TileType(WindType wind)
         {
             Suit = TileSuit.Wind;
             Number = 0;
             Wind = wind;
             Dragon = null;
-            TileId = tileId;
         }
 
         /// <summary>
         /// Constructor for Dragon tiles
         /// </summary>
-        public TileData(DragonType dragon, int tileId)
+        public TileType(DragonType dragon)
         {
             Suit = TileSuit.Dragon;
             Number = 0;
             Wind = null;
             Dragon = dragon;
-            TileId = tileId;
         }
 
         #endregion
@@ -105,80 +101,40 @@ namespace MJ.Core.Tiles
         /// <summary>
         /// Checks if this is an honor tile (Wind or Dragon)
         /// </summary>
-        public bool IsHonor()
-        {
-            return Suit == TileSuit.Wind || Suit == TileSuit.Dragon;
-        }
+        public bool IsHonor() => Suit == TileSuit.Wind || Suit == TileSuit.Dragon;
 
         /// <summary>
         /// Checks if this is a terminal tile (1 or 9 of a suit)
         /// </summary>
-        public bool IsTerminal()
-        {
-            return !IsHonor() && !IsBonus() && (Number == 1 || Number == 9);
-        }
+        public bool IsTerminal() => !IsHonor() && !IsBonus() && (Number == 1 || Number == 9);
 
         /// <summary>
         /// Checks if this is a simple tile (2-8 of a suit)
         /// </summary>
-        public bool IsSimple()
-        {
-            return !IsHonor() && !IsBonus() && Number >= 2 && Number <= 8;
-        }
+        public bool IsSimple() => !IsHonor() && !IsBonus() && !IsTerminal();
 
         /// <summary>
         /// Checks if this is a bonus tile (Flower or Season)
         /// </summary>
-        public bool IsBonus()
-        {
-            return Suit == TileSuit.Flower || Suit == TileSuit.Season;
-        }
+        public bool IsBonus() => Suit == TileSuit.Flower || Suit == TileSuit.Season;
 
         #endregion
 
         #region Comparison Methods
 
-        /// <summary>
-        /// Checks if two tiles are the same type (ignoring TileId)
-        /// Used for matching tiles in melds
-        /// </summary>
-        public bool IsSameType(TileData other)
-        {
-            if (Suit != other.Suit) return false;
+        public override bool Equals(object obj) => obj is TileType && Equals((TileType)obj);
 
-            if (Suit == TileSuit.Wind) return Wind == other.Wind;
-            if (Suit == TileSuit.Dragon) return Dragon == other.Dragon;
-            
-            return Number == other.Number;
-        }
+        public bool Equals(TileType other) =>
+            Suit == other.Suit &&
+            Number == other.Number &&
+            Wind == other.Wind &&
+            Dragon == other.Dragon;
 
-        /// <summary>
-        /// IEquatable implementation - checks if tiles are identical (including TileId)
-        /// </summary>
-        public bool Equals(TileData other)
-        {
-            return TileId == other.TileId;
-        }
+        public override int GetHashCode() => base.GetHashCode();
 
-        public override bool Equals(object obj)
-        {
-            return obj is TileData other && Equals(other);
-        }
+        public static bool operator ==(TileType left, TileType right) => left.Equals(right);
 
-        public override int GetHashCode()
-        {
-            return TileId.GetHashCode();
-        }
-
-        public static bool operator ==(TileData left, TileData right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(TileData left, TileData right)
-        {
-            return !left.Equals(right);
-        }
+        public static bool operator !=(TileType left, TileType right) => !left.Equals(right);
 
         #endregion
 
@@ -201,12 +157,12 @@ namespace MJ.Core.Tiles
             
             if (Suit == TileSuit.Flower)
             {
-                return $"Flower {Number}";
+                return $"{Number} Flower";
             }
             
             if (Suit == TileSuit.Season)
             {
-                return $"Season {Number}";
+                return $"{Number} Season";
             }
             
             return $"{Number} {Suit}";
@@ -243,12 +199,12 @@ namespace MJ.Core.Tiles
             
             if (Suit == TileSuit.Flower)
             {
-                return $"F{Number}";
+                return $"{Number}F";
             }
             
             if (Suit == TileSuit.Season)
             {
-                return $"S{Number}";
+                return $"{Number}S";
             }
             
             char suitChar = Suit switch
