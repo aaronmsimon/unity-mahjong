@@ -166,11 +166,11 @@ namespace MJ.UI
             // Build tile type from dropdown selections
             searchedTileType = BuildTileDataFromDropdowns();
 
-            if (searchedTileType.Equals(default(TileData)))
-            {
-                Debug.LogError("Failed to build tile data from dropdowns");
-                return;
-            }
+            // if (searchedTileType.Equals(default(TileData)))
+            // {
+            //     Debug.LogError("Failed to build tile data from dropdowns");
+            //     return;
+            // }
 
             // Search for all instances of this tile type (instant with location tracking!)
             foundLocations = gameFlowController.FindAllTilesOfType(searchedTileType);
