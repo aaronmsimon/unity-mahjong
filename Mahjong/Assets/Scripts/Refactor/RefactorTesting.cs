@@ -1,17 +1,19 @@
 using UnityEngine;
 using MJ2.Core.Tiles;
+using System.Collections.Generic;
 
 namespace MJ2.RefactorTesting
 {
     public class RefactorTesting : MonoBehaviour
     {
+        [SerializeField] private TileSetSO tileSetSO;
         private void Start() {
-            TileType bamboo5_a = new TileType(TileSuit.Bamboo, 5);
-            TileType bamboo5_b = new TileType(TileSuit.Bamboo, 5);
-            TileType numbers5 = new TileType(TileSuit.Characters, 5);
+            TileSetFactory factory = new TileSetFactory(tileSetSO);
+            List<Tile> tiles = factory.CreateTileSest();
 
-            Debug.Log($"compare bamboo 5: {bamboo5_a == bamboo5_b}");
-            Debug.Log($"compare 5s: {bamboo5_a == numbers5}");
+            foreach (Tile tile in tiles) {
+                Debug.Log(tile.tileType.ToString());
+            }
         }
     }
 }

@@ -13,7 +13,8 @@ namespace MJ2.Core.Tiles
         Wind,        // 風牌 (East, South, West, North)
         Dragon,      // 三元牌 (Red, Green, White)
         Flower,      // 花牌 (bonus tiles)
-        Season       // 季牌 (bonus tiles)
+        Season,       // 季牌 (bonus tiles)
+        Jokers
     }
 
     /// <summary>
