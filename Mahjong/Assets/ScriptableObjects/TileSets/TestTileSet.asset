@@ -12,4 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 729301aec15c1234fb093e2a27ee3456, type: 3}
   m_Name: TestTileSet
   m_EditorClassIdentifier: Assembly-CSharp::MJ2.Core.Tiles.TileSetSO
-  tileSetItems: []
+  tileSetItems:
+  - {fileID: 11400000, guid: 58ed34e23b9017c41ae3838b3192a25d, type: 2}
+  - {fileID: 11400000, guid: c2ac1cad47e98054a9ff88a9dc20c895, type: 2}
+  - {fileID: 11400000, guid: ed7482f2b9fdc1443b4d32de868e24ac, type: 2}
+  - {fileID: 11400000, guid: b76122185c23d4941baea88eaeda9d23, type: 2}
+  - {fileID: 11400000, guid: 4083944e42c3dba409be58c3e3c04dea, type: 2}
+  - {fileID: 11400000, guid: 78ff7118502672b4aa8e0883a8a8f133, type: 2}
+  - {fileID: 11400000, guid: 6b9e4ff73e486a241bc5c5caf741f27c, type: 2}

@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedecc4217f5a034e9dc9286d222c860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MJ2.RefactorTesting.RefactorTesting
+  tileSetSO: {fileID: 11400000, guid: 0789ad515d309e8499c0c2966a2d092f, type: 2}
 --- !u!4 &269397093
 Transform:
   m_ObjectHideFlags: 0

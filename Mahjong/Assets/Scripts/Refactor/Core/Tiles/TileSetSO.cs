@@ -13,18 +13,19 @@ namespace MJ2.Core.Tiles
         public List<Tile> CreateTileSet() {
             List<Tile> tiles = new List<Tile>();
 
+
             foreach (TileSetItemSO item in tileSetItems) {
-                if (item.maxValue - item.minValue + 1 > 0) {
+                if (item.maxValue - item.minValue > 0) {
                     for (int i = item.minValue; i <= item.maxValue; i++) {
-                        AddTileCopies(new TileType(item.suit, i), item.copies);
+                        tiles.AddRange(CreateTileCopies(new TileType(item.suit, i), item.copies));
                     }
-                } else if (item.winds != null) {
+                } else if (item.winds.Length > 0) {
                     foreach (WindType wind in item.winds) {
-                        AddTileCopies(new TileType(wind), item.copies);
+                        tiles.AddRange(CreateTileCopies(new TileType(wind), item.copies));
                     }
-                } else if (item.dragons != null) {
+                } else if (item.dragons.Length > 0) {
                     foreach (DragonType dragon in item.dragons) {
-                        AddTileCopies(new TileType(dragon), item.copies);
+                        tiles.AddRange(CreateTileCopies(new TileType(dragon), item.copies));
                     }
                 } else if (item.suit == TileSuit.Jokers) {
                     throw new System.Exception("Jokers not implemented yet.");
@@ -33,11 +34,15 @@ namespace MJ2.Core.Tiles
             return tiles;
         }
 
-        private void AddTileCopies(TileType tileType, int copies) {
-            Debug.Log($"tile type: {tileType}, copies: {copies}");
+        private List<Tile> CreateTileCopies(TileType tileType, int copies) {
+            List<Tile> tiles = new List<Tile>();
+
             for (int i = 0; i < copies; i++) {
-                tiles.Add(new Tile(tileType));
+                Tile test = new Tile(tileType);
+                tiles.Add(test);
             }
+
+            return tiles;
         }
     }
 }
