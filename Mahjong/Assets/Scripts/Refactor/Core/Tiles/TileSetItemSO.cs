@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using MJ.Core.Tiles;
 
 namespace MJ2.Core.Tiles
 {
@@ -13,9 +11,5 @@ namespace MJ2.Core.Tiles
         public WindType[] winds;
         public DragonType[] dragons;
         public int copies;
-        
-        private List<TileInstance> tiles;
-
-        public List<TileInstance> GetTiles() => tiles;
     }
 }

@@ -7,13 +7,13 @@ namespace MJ2.Core.Tiles
     /// </summary>
     public enum TileSuit
     {
-        Characters,  // 萬子 (1-9)
-        Bamboo,      // 索子 (1-9)
-        Dots,        // 筒子 (1-9)
-        Wind,        // 風牌 (East, South, West, North)
-        Dragon,      // 三元牌 (Red, Green, White)
-        Flower,      // 花牌 (bonus tiles)
-        Season,       // 季牌 (bonus tiles)
+        Characters,
+        Bamboo,
+        Dots,
+        Wind,
+        Dragon,
+        Flower,
+        Season,
         Jokers
     }
 
@@ -33,9 +33,9 @@ namespace MJ2.Core.Tiles
     /// </summary>
     public enum DragonType
     {
-        Red,    // 紅中
-        Green,  // 發財
-        White   // 白板
+        Red,
+        Green,
+        White
     }
 
     /// <summary>
@@ -45,14 +45,12 @@ namespace MJ2.Core.Tiles
     public readonly struct TileType : IEquatable<TileType>
     {
         public TileSuit Suit { get; }
-        public int Number { get; }  // 1-9 for suited tiles, 1-4 for Flowers/Seasons
-        public WindType? Wind { get; }
-        public DragonType? Dragon { get; }
+        public TileValue Value { get; }
 
         #region Constructors
 
         /// <summary>
-        /// Constructor for suited tiles (Bamboo, Characters, Dots)
+        /// Constructor for suited tiles (Bamboo, Characters, Dots, Flower, Season)
         /// </summary>
         public TileType(TileSuit suit, int number)
         {
@@ -68,9 +66,7 @@ namespace MJ2.Core.Tiles
             }
 
             Suit = suit;
-            Number = number;
-            Wind = null;
-            Dragon = null;
+            Value = new NumericTileValue(number);
         }
 
         /// <summary>
@@ -79,9 +75,7 @@ namespace MJ2.Core.Tiles
         public TileType(WindType wind)
         {
             Suit = TileSuit.Wind;
-            Number = 0;
-            Wind = wind;
-            Dragon = null;
+            Value = new WindTileValue(wind);
         }
 
         /// <summary>
@@ -90,10 +84,27 @@ namespace MJ2.Core.Tiles
         public TileType(DragonType dragon)
         {
             Suit = TileSuit.Dragon;
-            Number = 0;
-            Wind = null;
-            Dragon = dragon;
+            Value = new DragonTileValue(dragon);
         }
+
+        #endregion
+
+        #region Convenience Properties
+
+        /// <summary>
+        /// Gets numeric value if this is a numbered tile, otherwise -1
+        /// </summary>
+        public int Number => Value?.NumericValue ?? -1;
+
+        /// <summary>
+        /// Gets wind type if this is a wind tile, otherwise null
+        /// </summary>
+        public WindType? Wind => Value is WindTileValue wind ? wind.Wind : null;
+
+        /// <summary>
+        /// Gets dragon type if this is a dragon tile, otherwise null
+        /// </summary>
+        public DragonType? Dragon => Value is DragonTileValue dragon ? dragon.Dragon : null;
 
         #endregion
 
@@ -127,9 +138,7 @@ namespace MJ2.Core.Tiles
 
         public bool Equals(TileType other) =>
             Suit == other.Suit &&
-            Number == other.Number &&
-            Wind == other.Wind &&
-            Dragon == other.Dragon;
+            Value == other.Value;
 
         public override int GetHashCode() => base.GetHashCode();
 
@@ -145,28 +154,8 @@ namespace MJ2.Core.Tiles
         /// Returns a human-readable string representation of the tile
         /// </summary>
         public override string ToString()
-        {
-            if (Suit == TileSuit.Wind)
-            {
-                return $"{Wind} Wind";
-            }
-            
-            if (Suit == TileSuit.Dragon)
-            {
-                return $"{Dragon} Dragon";
-            }
-            
-            if (Suit == TileSuit.Flower)
-            {
-                return $"{Number} Flower";
-            }
-            
-            if (Suit == TileSuit.Season)
-            {
-                return $"{Number} Season";
-            }
-            
-            return $"{Number} {Suit}";
+        {            
+            return $"{Value} {Suit}";
         }
 
         /// <summary>
@@ -175,48 +164,9 @@ namespace MJ2.Core.Tiles
         /// </summary>
         public string ToCompactString()
         {
-            if (Suit == TileSuit.Wind)
-            {
-                return Wind switch
-                {
-                    WindType.East => "EW",
-                    WindType.South => "SW",
-                    WindType.West => "WW",
-                    WindType.North => "NW",
-                    _ => "?W"
-                };
-            }
-            
-            if (Suit == TileSuit.Dragon)
-            {
-                return Dragon switch
-                {
-                    DragonType.Red => "RD",
-                    DragonType.Green => "GD",
-                    DragonType.White => "WD",
-                    _ => "?D"
-                };
-            }
-            
-            if (Suit == TileSuit.Flower)
-            {
-                return $"{Number}F";
-            }
-            
-            if (Suit == TileSuit.Season)
-            {
-                return $"{Number}S";
-            }
-            
-            char suitChar = Suit switch
-            {
-                TileSuit.Bamboo => 'B',
-                TileSuit.Characters => 'C',
-                TileSuit.Dots => 'D',
-                _ => '?'
-            };
-            
-            return $"{Number}{suitChar}";
+            if (IsHonor()) return Value.ToCompactString();
+
+            return $"{Value.ToCompactString()}{Suit.ToString()[0]}";
         }
 
         #endregion
