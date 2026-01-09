@@ -149,6 +149,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MJ2.RefactorTesting.RefactorTesting
   tileSetSO: {fileID: 11400000, guid: 0789ad515d309e8499c0c2966a2d092f, type: 2}
+  tileContainer: {fileID: 1766881053}
+  tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
+  inputReader: {fileID: 11400000, guid: 7178b9b47f034e34397c4ca8f893b56c, type: 2}
 --- !u!4 &269397093
 Transform:
   m_ObjectHideFlags: 0
