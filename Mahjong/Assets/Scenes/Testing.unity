@@ -145,13 +145,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 269397091}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dedecc4217f5a034e9dc9286d222c860, type: 3}
+  m_Script: {fileID: 11500000, guid: fdbe2f45e087837449381c2edabe0a47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MJ2.RefactorTesting.RefactorTesting
-  tileSetSO: {fileID: 11400000, guid: 0789ad515d309e8499c0c2966a2d092f, type: 2}
-  tileContainer: {fileID: 1766881053}
-  tilePrefab: {fileID: 144046120491023478, guid: 5fe168938e16a8444b3fda94be1607b6, type: 3}
-  inputReader: {fileID: 11400000, guid: 7178b9b47f034e34397c4ca8f893b56c, type: 2}
+  tileSetSO: {fileID: 0}
+  tileContainer: {fileID: 0}
+  tilePrefab: {fileID: 0}
+  inputReader: {fileID: 0}
 --- !u!4 &269397093
 Transform:
   m_ObjectHideFlags: 0
