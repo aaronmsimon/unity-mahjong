@@ -4,35 +4,6 @@ namespace MJ.Core.Tiles
 {
     public class TileSetFactory
     {
-        private TileSetSO tileSetSO;
-
-        public TileSetFactory(TileSetSO tileSetSO) {
-            this.tileSetSO = tileSetSO;
-        }
-
-        public List<Tile> CreateTileSet() {
-            List<Tile> tiles = new List<Tile>();
-
-            foreach (TileSetItemSO item in tileSetSO.tileSetItems) {
-                if (item.maxValue - item.minValue > 0) {
-                    for (int i = item.minValue; i <= item.maxValue; i++) {
-                        tiles.AddRange(CreateTileCopies(new TileType(item.suit, i), item.copies));
-                    }
-                } else if (item.winds.Length > 0) {
-                    foreach (WindType wind in item.winds) {
-                        tiles.AddRange(CreateTileCopies(new TileType(wind), item.copies));
-                    }
-                } else if (item.dragons.Length > 0) {
-                    foreach (DragonType dragon in item.dragons) {
-                        tiles.AddRange(CreateTileCopies(new TileType(dragon), item.copies));
-                    }
-                } else if (item.suit == TileSuit.Jokers) {
-                    throw new System.Exception("Jokers not implemented yet.");
-                }
-            }
-            return tiles;
-        }
-
         /// <summary>
         /// Shuffles a list of tiles using Fisher-Yates algorithm
         /// </summary>
