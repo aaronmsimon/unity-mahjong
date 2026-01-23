@@ -46,19 +46,27 @@ namespace MJ.Core.Tiles
             };
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             return obj is TileID other && Equals(other);
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return Suit switch {
                 Suit.Characters or Suit.Bamboo or Suit.Dots =>
                     HashCode.Combine(Suit, Rank),
                 Suit.Winds => HashCode.Combine(Suit, Wind),
                 Suit.Dragons => HashCode.Combine(Suit, Dragon),
                 _ => Suit.GetHashCode()
+            };
+        }
+
+        public override string ToString() {
+            return Suit switch {
+                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                    $"{Rank} {Suit}",
+                Suit.Winds => $"{Wind} Wind",
+                Suit.Dragons => $"{Dragon} Dragon",
+                _ => "Unknown Tile"
             };
         }
     }
