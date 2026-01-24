@@ -34,6 +34,21 @@ namespace MJ.Core.Tiles
         public Winds Wind;
         public Dragons Dragon;
 
+        public TileID(Suit suit, int rank) {
+            Suit = suit;
+            Rank = rank;
+        }
+
+        public TileID(Winds wind) {
+            Suit = Suit.Winds;
+            Wind = wind;
+        }
+
+        public TileID(Dragons dragon) {
+            Suit = Suit.Dragons;
+            Dragon = dragon;
+        }
+
         public bool Equals(TileID other) {
             if (Suit != other.Suit) return false;
 
