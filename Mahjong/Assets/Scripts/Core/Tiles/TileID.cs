@@ -27,7 +27,7 @@ namespace MJ.Core.Tiles
         White
     }
 
-    public class TileID : IEquatable<TileID>
+    public class TileID : IEquatable<TileID>, IComparable<TileID>
     {
         public Suit Suit;
         public int Rank;
@@ -72,6 +72,20 @@ namespace MJ.Core.Tiles
                 Suit.Winds => HashCode.Combine(Suit, Wind),
                 Suit.Dragons => HashCode.Combine(Suit, Dragon),
                 _ => Suit.GetHashCode()
+            };
+        }
+
+        public int CompareTo(TileID other)
+        {
+            int suitCompare = Suit.CompareTo(other.Suit);
+            if (suitCompare != 0) return suitCompare;
+
+            return Suit switch {
+                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                    Suit != other.Suit ? Suit.CompareTo(other.Suit) : Rank.CompareTo(other.Rank),
+                Suit.Winds => Wind.CompareTo(other.Wind),
+                Suit.Dragons => Dragon.CompareTo(other.Dragon),
+                _ => 99
             };
         }
 
