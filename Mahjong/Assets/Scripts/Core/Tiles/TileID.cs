@@ -53,7 +53,7 @@ namespace MJ.Core.Tiles
             if (Suit != other.Suit) return false;
 
             return Suit switch {
-                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                Suit.Characters or Suit.Bamboo or Suit.Dots or Suit.Flowers or Suit.Seasons =>
                     Suit == other.Suit && Rank == other.Rank,
                 Suit.Winds => Wind == other.Wind,
                 Suit.Dragons => Dragon == other.Dragon,
@@ -65,9 +65,19 @@ namespace MJ.Core.Tiles
             return obj is TileID other && Equals(other);
         }
 
+        public static bool operator ==(TileID left, TileID right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(TileID left, TileID right)
+        {
+            return !left.Equals(right);
+        }
+
         public override int GetHashCode() {
             return Suit switch {
-                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                Suit.Characters or Suit.Bamboo or Suit.Dots or Suit.Flowers or Suit.Seasons =>
                     HashCode.Combine(Suit, Rank),
                 Suit.Winds => HashCode.Combine(Suit, Wind),
                 Suit.Dragons => HashCode.Combine(Suit, Dragon),
@@ -81,7 +91,7 @@ namespace MJ.Core.Tiles
             if (suitCompare != 0) return suitCompare;
 
             return Suit switch {
-                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                Suit.Characters or Suit.Bamboo or Suit.Dots or Suit.Flowers or Suit.Seasons =>
                     Suit != other.Suit ? Suit.CompareTo(other.Suit) : Rank.CompareTo(other.Rank),
                 Suit.Winds => Wind.CompareTo(other.Wind),
                 Suit.Dragons => Dragon.CompareTo(other.Dragon),
@@ -91,7 +101,7 @@ namespace MJ.Core.Tiles
 
         public override string ToString() {
             return Suit switch {
-                Suit.Characters or Suit.Bamboo or Suit.Dots =>
+                Suit.Characters or Suit.Bamboo or Suit.Dots or Suit.Flowers or Suit.Seasons =>
                     $"{Rank} {Suit}",
                 Suit.Winds => $"{Wind} Wind",
                 Suit.Dragons => $"{Dragon} Dragon",
