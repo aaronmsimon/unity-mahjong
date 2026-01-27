@@ -27,27 +27,13 @@ namespace MJ.Core.Tiles
         White
     }
 
-    public class TileID : IEquatable<TileID>, IComparable<TileID>
+    [Serializable]
+    public struct TileID : IEquatable<TileID>, IComparable<TileID>
     {
         public Suit Suit;
         public int Rank;
         public Winds Wind;
         public Dragons Dragon;
-
-        public TileID(Suit suit, int rank) {
-            Suit = suit;
-            Rank = rank;
-        }
-
-        public TileID(Winds wind) {
-            Suit = Suit.Winds;
-            Wind = wind;
-        }
-
-        public TileID(Dragons dragon) {
-            Suit = Suit.Dragons;
-            Dragon = dragon;
-        }
 
         public bool Equals(TileID other) {
             if (Suit != other.Suit) return false;
@@ -92,7 +78,7 @@ namespace MJ.Core.Tiles
 
             return Suit switch {
                 Suit.Characters or Suit.Bamboo or Suit.Dots or Suit.Flowers or Suit.Seasons =>
-                    Suit != other.Suit ? Suit.CompareTo(other.Suit) : Rank.CompareTo(other.Rank),
+                    Rank.CompareTo(other.Rank),
                 Suit.Winds => Wind.CompareTo(other.Wind),
                 Suit.Dragons => Dragon.CompareTo(other.Dragon),
                 _ => 99
