@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01c9039a5804a0b49b139b193f90848c, type: 3}
-  m_Name: Characters1
+  m_Name: Characters7
   m_EditorClassIdentifier: Assembly-CSharp::MJ.Core.Tiles.TileDefinition
-  Suit: 0
-  Number: 0
-  Wind: 0
-  Dragon: 0
-  Sprite: {fileID: 0}
-  DisplayName: 
+  TileInfo:
+    Suit: 0
+    Rank: 7
+    Wind: 0
+    Dragon: 0
+  Sprite: {fileID: 21300000, guid: 86bfef3898edb99449a5e5a88e522011, type: 3}
+  DisplayName: 7 Characters
+  Copies: 4
