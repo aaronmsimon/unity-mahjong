@@ -12,9 +12,16 @@ namespace MJ.Testing
             Debug.Log("-= TESTING =-");
             Debug.Log("get TileDef by Passing TileID to TileCatalog");
 
-            TileDefinition tile = catalog.GetTileDefinition(tileDef.TileInfo);
+            TileID id = tileDef.TileInfo;
+            TileDefinition result = catalog.GetTileDefinition(id);
 
-            Debug.Log($"Tile {tileDef.TileInfo} was found in the catalog as {tile.TileInfo}");
+            Debug.Assert(result != null, "Catalog returned null TileDefinition");
+            Debug.Assert(
+                result.TileInfo.Equals(id),
+                $"Catalog returned wrong tile. Expected {id}, got {result.TileInfo}"
+            );
+
+            Debug.Log($"PASS: {id} resolved to {result.name}");
         }
     }
 }
