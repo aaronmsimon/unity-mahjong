@@ -24,10 +24,12 @@ namespace MJ.Core.Tiles
 
             foreach (TileDefinition tileDef in tiles)
             {
-                if (!lookup.ContainsKey(tileDef.TileInfo)) {
-                    lookup.Add(tileDef.TileInfo, tileDef);
+                TileID tileID = tileDef.TileInfo;
+
+                if (!lookup.ContainsKey(tileID)) {
+                    lookup.Add(tileID, tileDef);
                 } else {
-                    Debug.LogError($"Duplicate TileID: {tileDef.TileInfo}");
+                    Debug.LogError($"Duplicate TileID: {tileID}");
                 }
             }
         }
