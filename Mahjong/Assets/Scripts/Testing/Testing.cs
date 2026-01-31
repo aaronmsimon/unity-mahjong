@@ -5,15 +5,15 @@ namespace MJ.Testing
 {
     public class Testing : MonoBehaviour
     {
-        [SerializeField] private TileCatalog catalog;
-        [SerializeField] private TileDefinition tileDef;
+        [SerializeField] private TileCatalogSO catalog;
+        [SerializeField] private TileDefinitionSO tileDef;
         
         private void Start() {
             Debug.Log("-= TESTING =-");
             Debug.Log("get TileDef by Passing TileID to TileCatalog");
 
             TileID id = tileDef.TileInfo;
-            TileDefinition result = catalog.GetTileDefinition(id);
+            TileDefinitionSO result = catalog.GetTileDefinition(id);
 
             Debug.Assert(result != null, "Catalog returned null TileDefinition");
             Debug.Assert(

@@ -4,25 +4,25 @@ using UnityEngine;
 namespace MJ.Core.Tiles
 {
     [CreateAssetMenu(fileName = "New TileCatalog", menuName = "Mahjong/Tiles/Tile Catalog")]
-    public class TileCatalog : ScriptableObject
+    public class TileCatalogSO : ScriptableObject
     {
-        public List<TileDefinition> tiles = new List<TileDefinition>();
+        public List<TileDefinitionSO> tiles = new List<TileDefinitionSO>();
 
-        private Dictionary<TileID, TileDefinition> lookup;
+        private Dictionary<TileID, TileDefinitionSO> lookup;
 
-        public TileDefinition GetTileDefinition(TileID tileID) {
+        public TileDefinitionSO GetTileDefinition(TileID tileID) {
             if (lookup == null) BuildLookup();
 
-            if (!lookup.TryGetValue(tileID, out TileDefinition tileDef)) Debug.LogAssertion($"No TileDefinition found for {tileID}");
+            if (!lookup.TryGetValue(tileID, out TileDefinitionSO tileDef)) Debug.LogAssertion($"No TileDefinition found for {tileID}");
 
             return tileDef;
         }
 
         private void BuildLookup()
         {
-            lookup = new Dictionary<TileID, TileDefinition>();
+            lookup = new Dictionary<TileID, TileDefinitionSO>();
 
-            foreach (TileDefinition tileDef in tiles)
+            foreach (TileDefinitionSO tileDef in tiles)
             {
                 TileID tileID = tileDef.TileInfo;
 
