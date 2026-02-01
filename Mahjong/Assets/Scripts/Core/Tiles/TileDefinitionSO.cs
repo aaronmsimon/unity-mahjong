@@ -8,6 +8,5 @@ namespace MJ.Core.Tiles
         public TileID TileInfo;
         public Sprite Sprite;
         public string DisplayName;
-        public int Copies;
     }
 }
