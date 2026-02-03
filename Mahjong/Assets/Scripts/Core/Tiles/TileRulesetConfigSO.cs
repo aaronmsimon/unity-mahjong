@@ -11,10 +11,13 @@ namespace MJ.Core.Tiles
         public bool IncludeFlowers;
         public bool IncludeSeasons;
         public bool IncludeJokers;
+        public bool IncludeBlanks;
+
         public int CopiesOfSuits;
         public int CopiesOfHonors;
         public int CopiesOfBonus;
         public int CopiesOfJokers;
+        public int CopiesOfBlanks;
         public int CopiesOfRed5;
     }
 }

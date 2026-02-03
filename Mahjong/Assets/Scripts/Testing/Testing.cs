@@ -6,6 +6,7 @@ namespace MJ.Testing
 {
     public class Testing : MonoBehaviour
     {
+        [SerializeField] private TileRulesetConfigSO config;
         [SerializeField] private TileCatalogSO catalog;
         
         private void Start() {
@@ -15,6 +16,7 @@ namespace MJ.Testing
             List<TileInstance> tiles = new List<TileInstance>();
 
             // int instanceID = 0;
+            
 
             // foreach (TileDefinitionSO tileDefinition in catalog.tiles) {
             //     for (int i = 0; i < tileDefinition.Copies; i++) {
