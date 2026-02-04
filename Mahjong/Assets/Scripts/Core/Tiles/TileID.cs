@@ -35,6 +35,12 @@ namespace MJ.Core.Tiles
         public Winds Wind;
         public Dragons Dragon;
 
+        public bool IsSuited => Suit is Suit.Characters or Suit.Bamboo or Suit.Dots;
+
+        public bool IsHonor => Suit is Suit.Winds or Suit.Dragons;
+
+        public bool IsBonus => Suit is Suit.Flowers or Suit.Seasons;
+
         public bool Equals(TileID other) {
             if (Suit != other.Suit) return false;
 

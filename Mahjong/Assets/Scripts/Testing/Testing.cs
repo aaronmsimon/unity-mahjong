@@ -11,18 +11,9 @@ namespace MJ.Testing
         
         private void Start() {
             Debug.Log("-= TESTING =-");
-            Debug.Log("create tile instances from the tilecatalog");
+            Debug.Log("create tile instances from the factory");
 
-            List<TileInstance> tiles = new List<TileInstance>();
-
-            // int instanceID = 0;
-            
-
-            // foreach (TileDefinitionSO tileDefinition in catalog.tiles) {
-            //     for (int i = 0; i < tileDefinition.Copies; i++) {
-            //         tiles.Add(new TileInstance(instanceID++, tileDefinition));
-            //     }
-            // }
+            List<TileInstance> tiles = TileSetFactory.Build(catalog, config);
 
             foreach (TileInstance tile in tiles) {
                 Debug.Log($"Tile Instance ID {tile.InstanceID}: Tile ID {tile.ID}");

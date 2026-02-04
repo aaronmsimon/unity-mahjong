@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f465421efe96b5a448bd554eee745c2b, type: 3}
+  m_Name: HongKongTileRulesetConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MJ.Core.Tiles.TileRulesetConfigSO
+  IncludeSuits: 1
+  IncludeWinds: 1
+  IncludeDragons: 1
+  IncludeFlowers: 1
+  IncludeSeasons: 1
+  IncludeJokers: 0
+  IncludeBlanks: 0
+  CopiesOfSuits: 4
+  CopiesOfHonors: 4
+  CopiesOfBonus: 1
+  CopiesOfJokers: 0
+  CopiesOfBlanks: 0
+  CopiesOfRed5: 0

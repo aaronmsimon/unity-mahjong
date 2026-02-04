@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20d221bf55323914590e980274b85ad7, type: 3}
-  m_Name: Chinese
+  m_Name: TileCatalog
   m_EditorClassIdentifier: Assembly-CSharp::MJ.Core.Tiles.TileCatalog
   tiles:
   - {fileID: 11400000, guid: 7c11eda21141dc54d9bbbff45b859c8d, type: 2}
