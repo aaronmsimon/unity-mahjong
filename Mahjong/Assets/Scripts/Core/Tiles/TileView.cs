@@ -9,7 +9,8 @@ namespace MJ.Core.Tiles
     {
         [Header("Renderers")]
         [SerializeField] private Image faceImage;
-        [SerializeField] private Sprite backSprite;
+        [SerializeField] private Color faceColor;
+        [SerializeField] private Color backColor;
 
         [Header("Optional Highlight")]
         [SerializeField] private GameObject highlightObject; // e.g., child ring/quad
@@ -17,10 +18,15 @@ namespace MJ.Core.Tiles
         public int InstanceId { get; private set; } = -1;
 
         private TileInstance _boundInstance;
+        private Image tileShape;
         private bool _isFaceUp = true;
 
         // Event raised when this tile is clicked.
         public event Action<int> Clicked;
+
+        private void Start() {
+            tileShape = transform.Find("TileShape").GetComponent<Image>();
+        }
 
         private void Reset()
         {
@@ -62,8 +68,8 @@ namespace MJ.Core.Tiles
 
             if (_boundInstance != null)
                 ApplyDefinition(_boundInstance.Definition);
-            else if (faceImage != null)
-                faceImage.sprite = faceUp ? null : backSprite;
+            else if (tileShape != null)
+                tileShape.color = faceUp ? faceColor : backColor;
         }
 
         public void SetHighlighted(bool on)
@@ -79,10 +85,6 @@ namespace MJ.Core.Tiles
             if (_isFaceUp)
             {
                 faceImage.sprite = def != null ? def.Sprite : null;
-            }
-            else
-            {
-                faceImage.sprite = backSprite;
             }
         }
 

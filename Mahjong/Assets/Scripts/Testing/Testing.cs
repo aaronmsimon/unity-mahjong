@@ -8,13 +8,14 @@ namespace MJ.Testing
     {
         [SerializeField] private TileDefinitionSO tileDefinition;
         [SerializeField] private TileView tileView;
+        [SerializeField] private bool faceUp;
         
         private void Start() {
             Debug.Log("-= TESTING =-");
             Debug.Log("create tile view");
 
             TileInstance tileInstance = new TileInstance(1, tileDefinition);
-            tileView.Bind(tileInstance);
+            tileView.Bind(tileInstance, faceUp);
         }
     }
 }
