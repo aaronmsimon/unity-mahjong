@@ -19,14 +19,11 @@ namespace MJ.Core.Tiles
 
         private TileInstance _boundInstance;
         private Image tileShape;
+        private GameObject tileFace;
         private bool _isFaceUp = true;
 
         // Event raised when this tile is clicked.
         public event Action<int> Clicked;
-
-        private void Start() {
-            tileShape = transform.Find("TileShape").GetComponent<Image>();
-        }
 
         private void Reset()
         {
@@ -43,6 +40,10 @@ namespace MJ.Core.Tiles
 
             _boundInstance = instance;
             InstanceId = instance.InstanceID;
+
+            tileShape = transform.Find("TileShape").GetComponent<Image>();
+            tileFace = transform.Find("TileFace").gameObject;
+            Debug.Log($"tileshape null? {tileShape == null}, tileface null? {tileFace == null}");
 
             SetFaceUp(faceUp);
             ApplyDefinition(instance.Definition);
@@ -66,10 +67,9 @@ namespace MJ.Core.Tiles
         {
             _isFaceUp = faceUp;
 
-            if (_boundInstance != null)
-                ApplyDefinition(_boundInstance.Definition);
-            else if (tileShape != null)
-                tileShape.color = faceUp ? faceColor : backColor;
+            if (tileShape != null) tileShape.color = faceUp ? faceColor : backColor;
+            if (tileFace != null) tileFace.SetActive(faceUp);
+            Debug.Log($"since faceup is {faceUp}, tileshape color is {tileShape.color} and tileface active is {faceUp}");
         }
 
         public void SetHighlighted(bool on)
