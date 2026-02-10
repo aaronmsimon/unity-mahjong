@@ -43,7 +43,6 @@ namespace MJ.Core.Tiles
 
             tileShape = transform.Find("TileShape").GetComponent<Image>();
             tileFace = transform.Find("TileFace").gameObject;
-            Debug.Log($"tileshape null? {tileShape == null}, tileface null? {tileFace == null}");
 
             SetFaceUp(faceUp);
             ApplyDefinition(instance.Definition);
@@ -69,7 +68,6 @@ namespace MJ.Core.Tiles
 
             if (tileShape != null) tileShape.color = faceUp ? faceColor : backColor;
             if (tileFace != null) tileFace.SetActive(faceUp);
-            Debug.Log($"since faceup is {faceUp}, tileshape color is {tileShape.color} and tileface active is {faceUp}");
         }
 
         public void SetHighlighted(bool on)

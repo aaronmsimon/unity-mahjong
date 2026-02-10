@@ -230,6 +230,7 @@ MonoBehaviour:
   tileDefinition: {fileID: 11400000, guid: 668ecf98218c5ea4aaddfd6b27d494d4, type: 2}
   tileView: {fileID: 1595825076}
   faceUp: 1
+  inputReader: {fileID: 11400000, guid: 7178b9b47f034e34397c4ca8f893b56c, type: 2}
 --- !u!4 &269397093
 Transform:
   m_ObjectHideFlags: 0
@@ -596,7 +597,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 150, y: 200}
   m_EdgeRadius: 0
 --- !u!1 &1786494059
 GameObject:
