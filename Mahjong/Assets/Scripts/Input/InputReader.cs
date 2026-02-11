@@ -14,9 +14,11 @@ namespace MJ.Input
         public event UnityAction printGameStateEvent;
 
         // Gameplay
-        public event UnityAction clickEvent;
+        public event UnityAction<Vector2, InputDevice> submitEvent;
 
         private GameInput gameInput;
+
+        private Vector2 lastPointerScreenPos;
 
         private void OnEnable()
         {
@@ -61,12 +63,11 @@ namespace MJ.Input
         }
 
         // Gameplay Events
-        public void OnClick(InputAction.CallbackContext context)
+        public void OnSubmit(InputAction.CallbackContext context)
         {
             if (context.phase == InputActionPhase.Performed) {
-                clickEvent?.Invoke();
-                Vector2 mousePos = Mouse.current.position.ReadValue();
-                Debug.Log($"Mouse Screen Position: {mousePos}");
+                if (Pointer.current != null) lastPointerScreenPos = Pointer.current.position.ReadValue();
+                submitEvent?.Invoke(lastPointerScreenPos, context.control?.device);
             }
         }
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using MJ.Core.Tiles;
 using MJ.Input;
 
@@ -24,15 +25,15 @@ namespace MJ.Testing
         }
 
         private void OnEnable() {
-            inputReader.clickEvent += OnClicked;
+            inputReader.submitEvent += OnSubmit;
         }
 
         private void OnDisable() {
-            inputReader.clickEvent -= OnClicked;
+            inputReader.submitEvent -= OnSubmit;
         }
 
-        private void OnClicked() {
-            // Debug.Log($"the screen has been clicked");
+        private void OnSubmit(Vector2 screenPos, InputDevice device) {
+            Debug.Log($"screen position: {screenPos} by {device}");
         }
     }
 }

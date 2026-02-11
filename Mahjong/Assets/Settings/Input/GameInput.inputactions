@@ -95,7 +95,7 @@
             "id": "5b0800b2-e98d-4471-9887-d40f00eeca1d",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "Submit",
                     "type": "Button",
                     "id": "0edb9841-5c65-4c3a-b630-01afa432a452",
                     "expectedControlType": "",
@@ -112,7 +112,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -123,7 +123,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -134,18 +134,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "947bb0ad-3540-4524-8917-292e660c9aa2",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
