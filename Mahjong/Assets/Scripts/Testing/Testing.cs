@@ -9,8 +9,7 @@ namespace MJ.Testing
 {
     public class Testing : MonoBehaviour
     {
-        [SerializeField] private TileDefinitionSO tileDefinition;
-        [SerializeField] private TileView tileView;
+        [SerializeField] private TileSetup[] tileSetups;
         [SerializeField] private bool faceUp;
 
         [Header("Settings")]
@@ -20,20 +19,35 @@ namespace MJ.Testing
             Debug.Log("-= TESTING =-");
             Debug.Log("create tile view");
 
-            TileInstance tileInstance = new TileInstance(1, tileDefinition);
-            tileView.Bind(tileInstance, faceUp);
+            int nextInstanceID = 0;
+            foreach (TileSetup tileSetup in tileSetups) {
+                TileInstance tileInstance = new TileInstance(nextInstanceID++, tileSetup.tileDefinition);
+                tileSetup.tileView.Bind(tileInstance, faceUp);
+            }
         }
 
         private void OnEnable() {
             inputReader.submitEvent += OnSubmit;
+            TileView.Clicked += OnClick;
         }
 
         private void OnDisable() {
             inputReader.submitEvent -= OnSubmit;
+            TileView.Clicked -= OnClick;
         }
 
         private void OnSubmit(Vector2 screenPos, InputDevice device) {
-            Debug.Log($"screen position: {screenPos} by {device}");
         }
+
+        private void OnClick(int instanceID) {
+            Debug.Log($"Instance ID {instanceID} clicked");
+        }
+    }
+
+    [Serializable]
+    public class TileSetup
+    {
+        public TileDefinitionSO tileDefinition;
+        public TileView tileView;        
     }
 }

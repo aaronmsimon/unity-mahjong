@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace MJ.Core.Tiles
 {
     [RequireComponent(typeof(Collider2D))] 
-    public class TileView : MonoBehaviour
+    public class TileView : MonoBehaviour, IPointerClickHandler
     {
         [Header("Renderers")]
         [SerializeField] private Image faceImage;
@@ -23,7 +24,7 @@ namespace MJ.Core.Tiles
         private bool _isFaceUp = true;
 
         // Event raised when this tile is clicked.
-        public event Action<int> Clicked;
+        public static event Action<int> Clicked;
 
         private void Reset()
         {
@@ -90,9 +91,7 @@ namespace MJ.Core.Tiles
         // Simplest approach: let a central input controller raycast and call TileView.OnClicked()
         // But if you want TileView to self-handle clicks, you can do OnMouseDown (works for mouse).
 
-        private void OnMouseDown()
-        {
-            // OnMouseDown requires a Collider and an active Camera
+        public void OnPointerClick(PointerEventData eventData) {
             if (InstanceId >= 0)
                 Clicked?.Invoke(InstanceId);
         }
